@@ -26,10 +26,17 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export default function App() {
+  // Use /imaginiv basename if current path starts with /imaginiv (e.g. GitHub Pages deployment)
+  // Otherwise use default root basename so AI Studio dev preview and root deployments do not render blank
+  const basename =
+    typeof window !== 'undefined' && window.location.pathname.startsWith('/imaginiv')
+      ? '/imaginiv'
+      : undefined;
+
   return (
     <ThemeProvider>
       <PageVisibilityProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={basename}>
           {/* Scroll position reset on every route transition */}
           <ScrollToTop />
 
