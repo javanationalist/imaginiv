@@ -11,21 +11,24 @@ import { bannersService, DEFAULT_BANNERS } from '../../services/bannersService';
 export interface BannerSectionProps {
   autoRotateInterval?: number; // default 7000ms (7s)
   className?: string;
+  fillHeader?: boolean; // default true (extends behind header to fill header background)
 }
 
 /**
  * BannerSection:
  * Replicates the Quartisan-style full-width edge-to-edge layout:
- * - Edge-to-edge image banner (no wood-frame border, no outer padding, directly below navbar)
+ * - Edge-to-edge image banner extending behind the header to fill the header background (no top cropping)
  * - Normal document flow (scrolls up naturally with the page, NOT fixed)
- * - Height ~420-480px on desktop, ~340px on mobile
- * - Subtle warm-dark tint over entire image for brand consistency
- * - Semi-transparent solid dark-brown overlay box on the LEFT side containing title & description
- * - NO buttons inside the overlay box (CTA is placed separately below the banner)
+ * - Height ~510-590px so the banner extends from y=0 down past the header with generous breathing room
+ * - Negative top margin pulls banner under the sticky Header so the banner image fills the header area seamlessly
+ * - Subtle top vignette gradient to ensure optimal header navigation contrast
+ * - Content padded down so title and description start comfortably below the floating navbar
+ * - Discreet corner dots indicator
  */
 export const BannerSection: React.FC<BannerSectionProps> = ({
   autoRotateInterval = 7000,
   className = '',
+  fillHeader = true,
 }) => {
   const [banners, setBanners] = useState<BannerItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -108,7 +111,11 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
     <section
       id="hero_banner_section"
       aria-label="Framedia Creative Visual Showcase"
-      className={`relative w-full overflow-hidden h-[340px] sm:h-[420px] md:h-[460px] lg:h-[490px] bg-[#1F1004] ${className}`}
+      className={`relative w-full overflow-hidden ${
+        fillHeader
+          ? '-mt-[66px] sm:-mt-[82px] h-[430px] sm:h-[510px] md:h-[550px] lg:h-[590px]'
+          : 'h-[340px] sm:h-[420px] md:h-[460px] lg:h-[490px]'
+      } bg-[#1F1004] ${className}`}
     >
       {/* 1. LAYER: EDGE-TO-EDGE FULL-WIDTH CAROUSEL IMAGE (Crossfade) */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -124,20 +131,26 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
             <img
               src={currentBanner.image_url}
               alt={currentBanner.caption || 'Framedia Creative Banner'}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-top"
               loading="eager"
             />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* 2. LAYER: WARM-DARK DIM OVERLAY ACROSS ENTIRE IMAGE
-          Ensures image stays branded with warm Framedia palette and text stays readable */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-[#231206]/40 to-black/30 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none" />
+      {/* 2. LAYER: GRADIENT OVERLAYS
+          - Top vignette behind the header for crisp navbar contrast and seamless integration
+          - Warm-dark dim overlay across entire image so text remains clear & legible
+          - Soft bottom fade into page */}
+      <div className="absolute inset-x-0 top-0 h-32 sm:h-40 bg-gradient-to-b from-black/75 via-black/35 to-transparent pointer-events-none z-1" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-[#231206]/40 to-black/30 pointer-events-none z-1" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none z-1" />
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-1" />
 
       {/* 3. LAYER: CONTENT CONTAINER WITH TEXT OVERLAY BOX ON LEFT SIDE */}
-      <div className="relative w-full h-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-start z-10">
+      <div className={`relative w-full h-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-start z-10 ${
+        fillHeader ? 'pt-[66px] sm:pt-[82px]' : ''
+      }`}>
         {/* Content Container (no enclosing box shape, text directly over banner with high legibility) */}
         <div
           className="w-full sm:max-w-xl lg:max-w-2xl my-auto py-4"
