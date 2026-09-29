@@ -1,0 +1,6 @@
+{
+  "name": "Imaginiv",
+  "description": "Imaginiv is a creative media agency with tactile, handcrafted UI, interactive directory hub, and modular CMS architecture.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,544 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Lilita One', cursive, sans-serif;
+    --font-body: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    
+    /* Game Village Palette */
+    --color-wood-light: #D69E63;
+    --color-wood-mid: #9A6237;
+    --color-wood-dark: #5E3A1A;
+    --color-wood-shadow: #381E0A;
+
+    --color-parchment-light: #FAF5E8;
+    --color-parchment-mid: #F2E4C8;
+    --color-parchment-dark: #DEC9A3;
+    --color-parchment-border: #D1B88F;
+
+    --color-btn-blue-top: #5AB4FC;
+    --color-btn-blue-mid: #2F8FE0;
+    --color-btn-blue-bottom: #166EBF;
+    --color-btn-blue-shadow: #0C4880;
+
+    --color-btn-green-top: #86E64B;
+    --color-btn-green-mid: #52C01B;
+    --color-btn-green-bottom: #398D10;
+    --color-btn-green-shadow: #215A07;
+
+    --color-text-dark: #381E0A;
+    --color-text-muted: #6B492B;
+    --color-forest-grass: #72B83E;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: #6EB238;
+    color: var(--color-text-dark);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+  }
+
+  /* Accessible focus indicators */
+  :focus-visible {
+    outline: 3px solid #2F8FE0;
+    outline-offset: 3px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME UI: WOOD FRAMES & BEVELS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Grand Wood Board (Main Pop-up / Main Window Frame) */
+.game-wood-frame {
+  background: linear-gradient(180deg, #A86F3A 0%, #8A5225 35%, #6E3B14 100%);
+  border: 4px solid #4A2408;
+  border-radius: 28px;
+  box-shadow: 
+    0 8px 0 #331604,
+    0 16px 36px rgba(25, 10, 3, 0.45),
+    inset 0 3px 0 rgba(255, 230, 180, 0.4),
+    inset 0 -4px 0 rgba(30, 12, 3, 0.5);
+  position: relative;
+}
+
+/* Compact Wood Card */
+.game-wood-card {
+  background: linear-gradient(180deg, #9C6433 0%, #804B1F 50%, #643511 100%);
+  border: 3px solid #421F06;
+  border-radius: 22px;
+  box-shadow: 
+    0 5px 0 #2D1302,
+    0 10px 20px rgba(20, 8, 2, 0.3),
+    inset 0 2px 0 rgba(255, 225, 175, 0.35),
+    inset 0 -3px 0 rgba(20, 8, 2, 0.45);
+  position: relative;
+}
+
+/* Wood Header Plank Banner (e.g. "EXCLUSIVE OFFER" / "FRAMEDIA CREATIVE") */
+.game-wood-plank {
+  background: linear-gradient(180deg, #BD7F44 0%, #9E5F2A 50%, #7A4218 100%);
+  border: 3px solid #4A2306;
+  border-radius: 18px;
+  box-shadow: 
+    0 5px 0 #321503,
+    0 8px 16px rgba(0, 0, 0, 0.35),
+    inset 0 2px 0 rgba(255, 235, 190, 0.5),
+    inset 0 -2px 0 rgba(35, 15, 3, 0.4);
+  position: relative;
+}
+
+/* Wood Navbar Bar */
+.game-wood-navbar {
+  background: linear-gradient(180deg, #9C6332 0%, #824C20 60%, #663813 100%);
+  border: 3px solid #452106;
+  border-radius: 20px;
+  box-shadow: 
+    0 6px 0 #2E1303,
+    0 12px 24px rgba(20, 8, 2, 0.35),
+    inset 0 2px 0 rgba(255, 230, 180, 0.4),
+    inset 0 -3px 0 rgba(25, 10, 2, 0.4);
+}
+
+/* Wooden Pill Badge (for timers, tags, info) */
+.game-wood-pill {
+  background: linear-gradient(180deg, #7C471E 0%, #5C3111 100%);
+  border: 2px solid #361905;
+  border-radius: 9999px;
+  box-shadow: 
+    0 3px 0 #240F02,
+    inset 0 1px 0 rgba(255, 220, 160, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+  color: #FFFFFF;
+}
+
+/* Round Wooden Circle Button (Close 'X' / Back '←' / Info 'i') */
+.game-wood-circle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #BD7E43 0%, #955623 50%, #6F3B13 100%);
+  border: 3px solid #482206;
+  box-shadow: 
+    0 4px 0 #2E1303,
+    0 8px 14px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 240, 200, 0.6),
+    inset 0 -2px 0 rgba(30, 10, 2, 0.5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  user-select: none;
+}
+
+.game-wood-circle-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 0 #2E1303,
+    0 10px 18px rgba(0, 0, 0, 0.35),
+    inset 0 2px 0 rgba(255, 240, 200, 0.7);
+}
+
+.game-wood-circle-btn:active {
+  transform: translateY(3px);
+  box-shadow: 
+    0 1px 0 #2E1303,
+    0 3px 6px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 240, 200, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME UI: PARCHMENT PAPER (Kertas Perkamen)
+   ═══════════════════════════════════════════════════════════════ */
+
+.game-parchment {
+  background: linear-gradient(180deg, #FFF8EC 0%, #F5E8CE 55%, #EADBBD 100%);
+  border: 3px solid #D6BC90;
+  border-radius: 20px;
+  box-shadow: 
+    inset 0 2px 10px rgba(115, 75, 30, 0.15),
+    inset 0 0 25px rgba(185, 145, 90, 0.15),
+    0 4px 10px rgba(50, 25, 5, 0.2);
+  color: #381E0A;
+  position: relative;
+}
+
+.game-parchment-inner {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FBF4E4 60%, #F3E6CB 100%);
+  border: 2px solid #DFCCAA;
+  border-radius: 16px;
+  box-shadow: 
+    inset 0 1px 4px rgba(100, 60, 20, 0.08),
+    0 2px 6px rgba(60, 30, 10, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME UI: 3D GLOSSY TACTILE BUTTONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Iconic Smurf Village Blue Button */
+.game-btn-blue {
+  background: linear-gradient(180deg, #67BDFF 0%, #2F8FE0 48%, #146FBF 100%);
+  border: 3px solid #0D457C;
+  border-radius: 18px;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  box-shadow: 
+    0 5px 0 #093764,
+    0 10px 18px rgba(10, 45, 80, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -2px 0 rgba(10, 45, 80, 0.3);
+  text-shadow: 0 2px 0 #08345E, 0 -1px 0 rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  min-height: 48px;
+  padding: 12px 28px;
+}
+
+.game-btn-blue:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 7px 0 #093764,
+    0 14px 22px rgba(10, 45, 80, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.75);
+}
+
+.game-btn-blue:active {
+  transform: translateY(4px);
+  box-shadow: 
+    0 1px 0 #093764,
+    0 3px 6px rgba(10, 45, 80, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Village Green Button */
+.game-btn-green {
+  background: linear-gradient(180deg, #88EC4D 0%, #52BE1A 48%, #368C0F 100%);
+  border: 3px solid #1F5407;
+  border-radius: 18px;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  box-shadow: 
+    0 5px 0 #184205,
+    0 10px 18px rgba(25, 70, 10, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -2px 0 rgba(15, 45, 5, 0.3);
+  text-shadow: 0 2px 0 #143704;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  min-height: 48px;
+  padding: 12px 28px;
+}
+
+.game-btn-green:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 7px 0 #184205,
+    0 14px 22px rgba(25, 70, 10, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.75);
+}
+
+.game-btn-green:active {
+  transform: translateY(4px);
+  box-shadow: 
+    0 1px 0 #184205,
+    0 3px 6px rgba(25, 70, 10, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Wood Button */
+.game-btn-wood {
+  background: linear-gradient(180deg, #BD7F44 0%, #985A26 50%, #723C13 100%);
+  border: 3px solid #431E05;
+  border-radius: 18px;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  box-shadow: 
+    0 5px 0 #2A1202,
+    0 10px 16px rgba(30, 12, 3, 0.35),
+    inset 0 2px 0 rgba(255, 235, 190, 0.5),
+    inset 0 -2px 0 rgba(30, 12, 3, 0.4);
+  text-shadow: 0 2px 0 #250F02;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  min-height: 48px;
+  padding: 12px 24px;
+}
+
+.game-btn-wood:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 7px 0 #2A1202,
+    0 14px 20px rgba(30, 12, 3, 0.4);
+}
+
+.game-btn-wood:active {
+  transform: translateY(4px);
+  box-shadow: 
+    0 1px 0 #2A1202,
+    0 3px 6px rgba(30, 12, 3, 0.25);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME UI: CARTOON TYPOGRAPHY & TEXT STROKES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Chunky 3D Cartoon Header Text with Dark Brown Outline (Like Smurfs' Village Popups) */
+.game-text-title {
+  font-family: var(--font-display);
+  color: #FFFFFF;
+  -webkit-text-stroke: 2px #381B07;
+  text-shadow: 
+    0 3px 0 #381B07,
+    0 5px 0 #251003,
+    0 8px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* Golden Cartoon Accent Text */
+.game-text-gold {
+  font-family: var(--font-display);
+  color: #FFE57F;
+  -webkit-text-stroke: 1.5px #543105;
+  text-shadow: 
+    0 3px 0 #543105,
+    0 5px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Subtle Cartoon Wood Stroke Text */
+.game-text-stroke {
+  font-family: var(--font-display);
+  color: #FFFFFF;
+  -webkit-text-stroke: 1.2px #442006;
+  text-shadow: 0 2px 0 #442006;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME UI: DECORATIVE RIBBONS & NAILS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Gold Notch Ribbon Banner (e.g. "SPECIAL", "ACTIVE", "BONUS") */
+.game-ribbon-gold {
+  background: linear-gradient(180deg, #FFDF6D 0%, #F5B82E 50%, #D89212 100%);
+  border: 2px solid #8A5205;
+  border-radius: 8px;
+  color: #4F2D02;
+  font-family: var(--font-display);
+  font-size: 13px;
+  padding: 4px 14px;
+  box-shadow: 
+    0 3px 0 #693C03,
+    0 6px 10px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Red Notch Ribbon Banner */
+.game-ribbon-red {
+  background: linear-gradient(180deg, #FF6B6B 0%, #E63939 50%, #B81D1D 100%);
+  border: 2px solid #6E0F0F;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 13px;
+  padding: 4px 14px;
+  box-shadow: 
+    0 3px 0 #500A0A,
+    0 6px 10px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 0 #500A0A;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Gold Rivet / Nail Head on Wood */
+.game-nail {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #FFF0AA 0%, #D4A346 60%, #754E15 100%);
+  box-shadow: 
+    0 2px 3px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  border: 1px solid #57370B;
+  display: inline-block;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME UI: CARTOON FOREST & ENVIRONMENT
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Cartoon Forest Backdrop with layered trees, hills, and clouds */
+.game-forest-world {
+  background: 
+    radial-gradient(ellipse at 50% 0%, #87D5FA 0%, #68BCE8 35%, #59A8D6 60%),
+    linear-gradient(180deg, #68BCE8 0%, #88D84B 60%, #63A832 100%);
+  background-attachment: fixed;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Floating Cartoon Clouds Animation */
+@keyframes floatSlow {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(18px) translateY(-6px); }
+  100% { transform: translateX(0); }
+}
+
+.anim-float {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+@keyframes mascotBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1.5deg); }
+}
+
+.anim-mascot-bounce {
+  animation: mascotBounce 4s ease-in-out infinite;
+}
+
+/* Reduced Motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME UI: UNIFIED ALIASES FOR CARTOON BUTTONS & CARDS
+   ═══════════════════════════════════════════════════════════════ */
+
+.btn-primary {
+  background: linear-gradient(180deg, #62B8FF 0%, #2F8FE0 48%, #166BB9 100%);
+  border: 3px solid #0E4780;
+  border-radius: 18px;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  box-shadow: 
+    0 5px 0 #093764,
+    0 10px 18px rgba(10, 45, 80, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -2px 0 rgba(10, 45, 80, 0.3);
+  text-shadow: 0 2px 0 #08345E, 0 -1px 0 rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 7px 0 #093764,
+    0 14px 22px rgba(10, 45, 80, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.75);
+}
+
+.btn-primary:active {
+  transform: translateY(4px);
+  box-shadow: 
+    0 1px 0 #093764,
+    0 3px 6px rgba(10, 45, 80, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(180deg, #BD7F44 0%, #985A26 50%, #723C13 100%);
+  border: 3px solid #431E05;
+  border-radius: 18px;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  box-shadow: 
+    0 5px 0 #2A1202,
+    0 10px 16px rgba(30, 12, 3, 0.35),
+    inset 0 2px 0 rgba(255, 235, 190, 0.5),
+    inset 0 -2px 0 rgba(30, 12, 3, 0.4);
+  text-shadow: 0 2px 0 #250F02;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+.btn-secondary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 7px 0 #2A1202,
+    0 14px 20px rgba(30, 12, 3, 0.4);
+}
+
+.btn-secondary:active {
+  transform: translateY(4px);
+  box-shadow: 
+    0 1px 0 #2A1202,
+    0 3px 6px rgba(30, 12, 3, 0.25);
+}
+
+.village-card {
+  background: #FFFDF8;
+  border: 3px solid #4A2408;
+  border-radius: 20px;
+  box-shadow: 
+    0 5px 0 #331604,
+    0 10px 20px rgba(25, 10, 3, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.8);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+.village-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 
+    0 8px 0 #331604,
+    0 16px 28px rgba(25, 10, 3, 0.28),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9);
+}
+
