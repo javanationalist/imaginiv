@@ -21,6 +21,7 @@ import { ArticleItem } from '../types';
 import { articlesService } from '../services/articlesService';
 import { authService } from '../services/authService';
 import { MarkdownContent } from '../components/ui/MarkdownContent';
+import { getArticleShareUrl } from '../utils/urlUtils';
 
 export const ArticleDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -68,10 +69,30 @@ export const ArticleDetailPage: React.FC = () => {
     };
   }, [slug, isAdmin]);
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+  const handleCopyLink = async () => {
+    const targetSlug = article?.slug || slug || '';
+    const shareUrl = getArticleShareUrl(targetSlug);
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: article?.title || 'Imaginiv Article',
+          text: article?.excerpt || article?.title || 'Read this article on Imaginiv',
+          url: shareUrl,
+        });
+        return;
+      } catch (_) {
+        // Fallback to clipboard copy if share dialog was dismissed
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
   };
 
   const formatDate = (isoString?: string | null) => {

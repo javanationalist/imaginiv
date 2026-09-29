@@ -315,11 +315,11 @@ export const BannerManager: React.FC = () => {
                   />
 
                   {filePreviewUrl ? (
-                    <div className="relative w-full max-h-40 overflow-hidden rounded-lg border border-[#D6BC90] group">
+                    <div className="relative w-full aspect-video overflow-hidden rounded-lg border-2 border-[#2F8FE0] bg-[#1F1004] group shadow-inner">
                       <img
                         src={filePreviewUrl}
                         alt="Selected background preview"
-                        className="w-full h-36 object-cover object-center"
+                        className="w-full h-full object-contain object-center"
                       />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span className="text-xs font-bold text-white bg-black/70 px-3 py-1.5 rounded-full">
@@ -455,12 +455,12 @@ export const BannerManager: React.FC = () => {
                       : 'bg-[#F2E5CE]/75 border-[#D1B78E] opacity-75'
                   }`}
                 >
-                  {/* Polaroid Wood Photo Header with Widescreen Ratio */}
-                  <div className="relative w-full h-28 sm:h-32 bg-[#1F1004] overflow-hidden group">
+                  {/* Polaroid Wood Photo Header with 16:9 Widescreen Ratio */}
+                  <div className="relative w-full aspect-video bg-[#1F1004] overflow-hidden group">
                     <img
                       src={banner.image_url}
                       alt={`Banner #${index + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-300"
                     />
 
                     {/* Sequence Badge */}
@@ -610,12 +610,12 @@ export const BannerManager: React.FC = () => {
               <span className="text-[10px] text-white/80">Directory &bull; Article</span>
             </div>
 
-            {/* Mock Dedicated Banner Section with Limited Height */}
-            <div className="relative w-full h-32 sm:h-36 rounded-xl overflow-hidden border-2 border-[#542E10] shadow-sm bg-[#1F1004]">
+            {/* Mock Dedicated Banner Section with 16:9 Aspect Ratio */}
+            <div className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-[#542E10] shadow-sm bg-[#1F1004]">
               <img
                 src={currentPreviewBanner.image_url}
                 alt="Banner preview"
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-contain object-center"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute top-2 left-2">
@@ -653,11 +653,11 @@ export const BannerManager: React.FC = () => {
             </div>
 
             {bannerToDelete.image_url && (
-              <div className="w-full h-36 rounded-xl overflow-hidden border-2 border-[#542E10] shadow-sm">
+              <div className="w-full aspect-video rounded-xl overflow-hidden border-2 border-[#542E10] shadow-sm bg-[#1F1004]">
                 <img
                   src={bannerToDelete.image_url}
                   alt="Background preview"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain object-center"
                 />
               </div>
             )}

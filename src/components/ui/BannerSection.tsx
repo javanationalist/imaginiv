@@ -17,13 +17,11 @@ export interface BannerSectionProps {
 /**
  * BannerSection:
  * Replicates the Quartisan-style full-width edge-to-edge layout:
- * - Edge-to-edge image banner extending behind the header to fill the header background (no top cropping)
- * - Normal document flow (scrolls up naturally with the page, NOT fixed)
- * - Height ~510-590px so the banner extends from y=0 down past the header with generous breathing room
- * - Negative top margin pulls banner under the sticky Header so the banner image fills the header area seamlessly
- * - Subtle top vignette gradient to ensure optimal header navigation contrast
- * - Content padded down so title and description start comfortably below the floating navbar
- * - Discreet corner dots indicator
+ * - 16:9 aspect ratio container matching 1920x1080 desktop banners
+ * - Complete 1920x1080 banner image is fully visible on desktop without cropping or distortion
+ * - Uses object-contain on desktop so 100% of the image is preserved
+ * - On mobile, image starts visually directly at the top with zero top gap or blank space
+ * - Padded content container ensures title & description overlay cleanly over header
  */
 export const BannerSection: React.FC<BannerSectionProps> = ({
   autoRotateInterval = 7000,
@@ -111,14 +109,12 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
     <section
       id="hero_banner_section"
       aria-label="Framedia Creative Visual Showcase"
-      className={`relative w-full overflow-hidden ${
-        fillHeader
-          ? '-mt-[66px] sm:-mt-[82px] h-[430px] sm:h-[510px] md:h-[550px] lg:h-[590px]'
-          : 'h-[340px] sm:h-[420px] md:h-[460px] lg:h-[490px]'
-      } bg-[#1F1004] ${className}`}
+      className={`relative w-full overflow-hidden bg-[#1F1004] ${
+        fillHeader ? '-mt-[66px] sm:-mt-[82px]' : ''
+      } ${className}`}
     >
-      {/* 1. LAYER: EDGE-TO-EDGE FULL-WIDTH CAROUSEL IMAGE (Crossfade) */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
+      {/* 1. LAYER: 16:9 RESPONSIVE BANNER CONTAINER */}
+      <div className="relative w-full aspect-video min-h-[250px] sm:min-h-[340px] max-h-[85vh] mx-auto overflow-hidden bg-[#1F1004] flex items-center justify-center">
         <AnimatePresence mode="sync">
           <motion.div
             key={currentBanner.id || currentIndex}
@@ -126,67 +122,63 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.2, ease: 'easeInOut' }}
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 w-full h-full flex items-start md:items-center justify-center"
           >
             <img
               src={currentBanner.image_url}
               alt={currentBanner.caption || 'Framedia Creative Banner'}
-              className="w-full h-full object-cover object-top"
+              className="w-full h-full object-cover object-top md:object-contain md:object-center"
               loading="eager"
             />
           </motion.div>
         </AnimatePresence>
-      </div>
 
-      {/* 2. LAYER: GRADIENT OVERLAYS
-          - Top vignette behind the header for crisp navbar contrast and seamless integration
-          - Warm-dark dim overlay across entire image so text remains clear & legible
-          - Soft bottom fade into page */}
-      <div className="absolute inset-x-0 top-0 h-32 sm:h-40 bg-gradient-to-b from-black/75 via-black/35 to-transparent pointer-events-none z-1" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-[#231206]/40 to-black/30 pointer-events-none z-1" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none z-1" />
-      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-1" />
+        {/* 2. LAYER: GRADIENT OVERLAYS */}
+        <div className="absolute inset-x-0 top-0 h-24 sm:h-36 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none z-1" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-[#231206]/35 to-black/25 pointer-events-none z-1" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none z-1" />
+        <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-1" />
 
-      {/* 3. LAYER: CONTENT CONTAINER WITH TEXT OVERLAY BOX ON LEFT SIDE */}
-      <div className={`relative w-full h-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-start z-10 ${
-        fillHeader ? 'pt-[66px] sm:pt-[82px]' : ''
-      }`}>
-        {/* Content Container (no enclosing box shape, text directly over banner with high legibility) */}
+        {/* 3. LAYER: CONTENT CONTAINER WITH TEXT OVERLAY */}
         <div
-          className="w-full sm:max-w-xl lg:max-w-2xl my-auto py-4"
+          className={`absolute inset-0 w-full h-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-start z-10 ${
+            fillHeader ? 'pt-[66px] sm:pt-[82px]' : ''
+          }`}
         >
-          {/* Big White Headline: Studio Name */}
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl text-white tracking-wide uppercase leading-tight drop-shadow-[0_3px_8px_rgba(0,0,0,0.85)] mb-2">
-            Imaginiv
-          </h1>
+          <div className="w-full sm:max-w-xl lg:max-w-2xl my-auto py-2 sm:py-4">
+            {/* Big White Headline: Studio Name */}
+            <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl text-white tracking-wide uppercase leading-tight drop-shadow-[0_3px_8px_rgba(0,0,0,0.85)] mb-1 sm:mb-2">
+              Imaginiv
+            </h1>
 
-          {/* Subtitle: Narrative Craft */}
-          <h2 className="text-lg sm:text-xl lg:text-2xl text-[#FFDE9E] font-display leading-snug mb-3 drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
-            Narrative Craft &amp; Tactile Visual Production
-          </h2>
+            {/* Subtitle: Narrative Craft */}
+            <h2 className="text-sm sm:text-xl lg:text-2xl text-[#FFDE9E] font-display leading-snug mb-1.5 sm:mb-3 drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]">
+              Narrative Craft &amp; Tactile Visual Production
+            </h2>
 
-          {/* Description Paragraph in Warm Light Cream */}
-          <p className="text-sm sm:text-base lg:text-lg text-[#FDF0DE] font-medium leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)] max-w-xl">
-            Welcome to our creative studio. Imaginiv is a multidisciplinary agency where narrative craft, tactile visual production, and forward-thinking media come together under one collaborative roof.
-          </p>
+            {/* Description Paragraph in Warm Light Cream */}
+            <p className="text-xs sm:text-base lg:text-lg text-[#FDF0DE] font-medium leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)] max-w-xl line-clamp-3 sm:line-clamp-none">
+              Welcome to our creative studio. Imaginiv is a multidisciplinary agency where narrative craft, tactile visual production, and forward-thinking media come together under one collaborative roof.
+            </p>
+          </div>
         </div>
+
+        {/* 4. DISCREET CORNER DOTS INDICATOR (BOTTOM RIGHT) */}
+        {displayBanners.length > 1 && (
+          <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-8 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs border border-white/15 pointer-events-none">
+            {displayBanners.map((_, dotIdx) => (
+              <span
+                key={dotIdx}
+                className={`transition-all duration-300 rounded-full ${
+                  dotIdx === currentIndex
+                    ? 'w-5 h-1.5 bg-[#2F8FE0]'
+                    : 'w-1.5 h-1.5 bg-white/40'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
-
-      {/* 4. DISCREET CORNER DOTS INDICATOR (BOTTOM RIGHT) */}
-      {displayBanners.length > 1 && (
-        <div className="absolute bottom-4 right-4 sm:right-8 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs border border-white/15 pointer-events-none">
-          {displayBanners.map((_, dotIdx) => (
-            <span
-              key={dotIdx}
-              className={`transition-all duration-300 rounded-full ${
-                dotIdx === currentIndex
-                  ? 'w-5 h-1.5 bg-[#2F8FE0]'
-                  : 'w-1.5 h-1.5 bg-white/40'
-              }`}
-            />
-          ))}
-        </div>
-      )}
     </section>
   );
 };

@@ -252,9 +252,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className={`relative w-full rounded-2xl sm:rounded-3xl overflow-hidden select-none group border-3 sm:border-4 border-[#542E10] shadow-[0_8px_0_#2B1302,0_16px_32px_rgba(0,0,0,0.35)] bg-[#1F1004] focus:outline-none focus:ring-4 focus:ring-[#2F8FE0]/60 ${
-        isMiniPreview ? 'h-52' : 'h-64 sm:h-80 md:h-[420px]'
-      } ${className}`}
+      className={`relative w-full aspect-video rounded-2xl sm:rounded-3xl overflow-hidden select-none group border-3 sm:border-4 border-[#542E10] shadow-[0_8px_0_#2B1302,0_16px_32px_rgba(0,0,0,0.35)] bg-[#1F1004] focus:outline-none focus:ring-4 focus:ring-[#2F8FE0]/60 ${className}`}
     >
       {/* Wooden Corner Rivets for Game Aesthetic */}
       <div className="absolute top-2.5 left-2.5 z-30 game-nail !w-3 !h-3 opacity-90 pointer-events-none" />
@@ -277,7 +275,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({
             <img
               src={currentBanner.image_url}
               alt={altText}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-top md:object-contain md:object-center"
               loading="lazy"
             />
             {/* Subtle dark gradient overlay to ensure text and buttons above are crisp & readable */}

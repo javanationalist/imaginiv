@@ -27,6 +27,7 @@ import { ArticleItem } from '../../types';
 import { articlesService } from '../../services/articlesService';
 import { Modal } from '../common/Modal';
 import { MarkdownContent } from '../ui/MarkdownContent';
+import { getArticleShareUrl, getAppBasePath } from '../../utils/urlUtils';
 
 type EditorTab = 'write' | 'preview';
 
@@ -414,7 +415,7 @@ export const ArticleManager: React.FC = () => {
                       <div className="flex items-center gap-1.5 mt-1 text-xs">
                         <LinkIcon className="w-3.5 h-3.5 text-[#8C5D35] shrink-0" />
                         <span className="font-mono text-[#8C5D35] bg-[#F2E5CE] px-2 py-0.5 rounded border border-[#DEC9A3] truncate max-w-xs sm:max-w-md">
-                          /article/{art.slug}
+                          {getAppBasePath()}/article/{art.slug}
                         </span>
                       </div>
 
@@ -436,7 +437,7 @@ export const ArticleManager: React.FC = () => {
                   <div className="flex items-center justify-end gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#E8D8B8]">
                     {art.is_published && (
                       <a
-                        href={`/article/${art.slug}`}
+                        href={getArticleShareUrl(art.slug)}
                         target="_blank"
                         rel="noreferrer"
                         className="game-btn-wood text-xs !py-1.5 !px-3 inline-flex items-center gap-1"
@@ -537,7 +538,7 @@ export const ArticleManager: React.FC = () => {
 
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-[#8C5D35] font-mono select-none">
-                    framedia.creative/article/
+                    {getAppBasePath()}/article/
                   </span>
                   <input
                     type="text"
