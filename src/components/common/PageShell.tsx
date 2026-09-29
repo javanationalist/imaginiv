@@ -15,7 +15,7 @@ export interface PageShellProps {
 
 export const PageShell: React.FC<PageShellProps> = ({ children, className = '' }) => {
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen flex flex-col relative overflow-x-hidden pt-14 sm:pt-16">
       {/* 1. Living Cartoon Forest Environment */}
       <ForestBackdrop />
 

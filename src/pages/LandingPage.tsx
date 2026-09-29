@@ -170,7 +170,7 @@ export const LandingPage: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-hidden bg-[#F6EAD2]" style={{ backgroundColor: '#F6EAD2' }}>
+    <div className="min-h-screen flex flex-col relative overflow-x-hidden bg-[#F6EAD2] pt-14 sm:pt-16" style={{ backgroundColor: '#F6EAD2' }}>
       {/* Cartoon Forest Living Environment Backdrop */}
       <ForestBackdrop bgColor="#F6EAD2" />
 
