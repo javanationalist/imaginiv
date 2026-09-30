@@ -74,42 +74,12 @@ export const authService = {
   },
 
   /**
-   * Google OAuth login via Supabase Auth
+   * Google OAuth login via Supabase Auth (Deactivated)
    */
-  async loginWithGoogle(redirectTo?: string): Promise<{ error: string | null; url?: string | null }> {
-    const client = getSupabaseClient();
-
-    if (!isSupabaseConfigured() || !client) {
-      return {
-        error: 'Supabase authentication is not configured. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your environment.',
-      };
-    }
-
-    try {
-      const basePath = getAppBasePath();
-      const targetRedirect = redirectTo || `${window.location.origin}${basePath}/admin`;
-
-      const { data, error } = await client.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: targetRedirect,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-
-      if (error) {
-        return { error: error.message };
-      }
-
-      return { error: null, url: data?.url };
-    } catch (err) {
-      return {
-        error: err instanceof Error ? err.message : 'An unexpected error occurred during Google sign-in.',
-      };
-    }
+  async loginWithGoogle(_redirectTo?: string): Promise<{ error: string | null; url?: string | null }> {
+    return {
+      error: 'Google login is currently disabled.',
+    };
   },
 
   /**

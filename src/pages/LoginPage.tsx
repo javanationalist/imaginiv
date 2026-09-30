@@ -94,12 +94,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleFillDemo = () => {
-    setEmail('admin@framedia.creative');
-    setPassword('village2026');
-    setError(null);
-  };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-x-hidden px-4 py-12">
       {/* Cartoon Forest Living Background */}
@@ -154,7 +148,7 @@ export const LoginPage: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@framedia.creative"
+                  placeholder="admin@imaginiv.site"
                   className="w-full bg-[#FFFDF7] text-[#381E0A] placeholder-[#8C6B4E] text-sm font-bold pl-9 pr-3 py-2 rounded-xl border-2 border-[#542E10] focus:outline-none focus:ring-2 focus:ring-[#2F8FE0]"
                   required
                 />
@@ -207,56 +201,37 @@ export const LoginPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Continue with Google Button */}
+          {/* Continue with Google Button (Deactivated / Disabled) */}
           <button
             type="button"
             id="google-login-btn"
-            onClick={handleGoogleLogin}
-            disabled={loading || googleLoading}
-            className="w-full py-2.5 px-4 rounded-xl font-display text-sm bg-white hover:bg-[#FAFAFA] active:bg-[#F2F2F2] text-[#3C4043] border-2 border-[#D6BC90] shadow-[0_2px_0_#C5A878] hover:shadow-[0_3px_0_#C5A878] active:translate-y-0.5 transition-all flex items-center justify-center gap-3 cursor-pointer min-h-[44px] touch-target select-none"
+            disabled={true}
+            aria-disabled="true"
+            title="Google login is currently disabled"
+            className="w-full py-2.5 px-4 rounded-xl font-display text-sm bg-[#EFE7D8] text-[#8C6B4E]/60 border-2 border-[#D6BC90]/70 opacity-60 cursor-not-allowed flex items-center justify-center gap-3 select-none shadow-none"
           >
-            {googleLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin text-[#4285F4]" />
-                <span className="font-sans font-bold text-sm text-[#3C4043]">Connecting to Google...</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    fill="#4285F4"
-                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                  />
-                </svg>
-                <span className="font-sans font-bold text-sm text-[#3C4043]">
-                  Continue with Google
-                </span>
-              </>
-            )}
+            <svg className="w-5 h-5 shrink-0 grayscale opacity-50" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="#4285F4"
+                d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+              />
+            </svg>
+            <span className="font-sans font-bold text-sm text-[#8C6B4E]">
+              Continue with Google (Disabled)
+            </span>
           </button>
-
-          {/* Demo Auto-Fill Shortcut */}
-          <div className="mt-5 pt-4 border-t border-[#D6BC90] text-center">
-            <button
-              type="button"
-              onClick={handleFillDemo}
-              className="text-xs font-bold text-[#146FBF] hover:underline cursor-pointer inline-flex items-center gap-1"
-            >
-              <span>Fill Demo Credentials (Admin)</span>
-            </button>
-          </div>
         </div>
       </div>
     </div>
