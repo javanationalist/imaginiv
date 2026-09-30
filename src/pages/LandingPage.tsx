@@ -207,8 +207,6 @@ export const LandingPage: React.FC = () => {
             {/* Corner Nails on Board */}
             <div className="absolute top-3 left-3 game-nail !w-3.5 !h-3.5" />
             <div className="absolute top-3 right-3 game-nail !w-3.5 !h-3.5" />
-            <div className="absolute bottom-3 left-3 game-nail !w-3.5 !h-3.5" />
-            <div className="absolute bottom-3 right-3 game-nail !w-3.5 !h-3.5" />
 
             {/* Top Plank Banner */}
             <div className="game-wood-plank -mt-8 sm:-mt-11 mx-auto max-w-sm sm:max-w-md py-2 px-6 text-center relative z-20 shadow-[0_5px_0_#2B1302]">

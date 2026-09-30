@@ -192,16 +192,7 @@ export const ArticleDetailPage: React.FC = () => {
 
       {/* Main Article Document */}
       <article className="max-w-4xl mx-auto">
-        {/* Clean Unboxed Category & Reading Time Kicker (Zero-Pill Discipline) */}
         <div className="space-y-3 mb-6">
-          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#8C5226]">
-            <span>Creative Thinking</span>
-            <span aria-hidden="true" className="text-[#D6BC90]">&bull;</span>
-            <span>5–7 min read</span>
-            <span aria-hidden="true" className="text-[#D6BC90]">&bull;</span>
-            <span>Imaginiv Editorial</span>
-          </div>
-
           <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl text-[#381E0A] leading-tight">
             {article.title}
           </h1>

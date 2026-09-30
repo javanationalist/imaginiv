@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { usePageVisibility } from '../../context/PageVisibilityContext';
+import { BRAND_ASSETS } from '../../utils/brand';
 
 export const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -90,30 +91,17 @@ export const Header: React.FC = () => {
       className="fixed top-0 left-0 right-0 w-full z-50 game-wood-header-strip transition-all duration-200"
     >
       <div className="w-full max-w-[1240px] mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between relative">
-        {/* Left & Right Gold Rivets */}
-        <div className="hidden sm:block absolute top-1/2 -translate-y-1/2 left-3 game-nail" />
-        <div className="hidden sm:block absolute top-1/2 -translate-y-1/2 right-3 game-nail" />
-
         {/* Brand identity: Village Sign */}
         <Link
           to="/"
           id="header-logo"
-          className="flex items-center gap-2 sm:gap-2.5 group select-none min-h-[40px] sm:min-h-[44px] touch-target pl-1 sm:pl-2 shrink min-w-0"
+          className="flex items-center group select-none min-h-[40px] sm:min-h-[44px] touch-target pl-1 sm:pl-2 shrink min-w-0"
         >
-          {/* Wooden / Golden Emblem */}
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-b from-[#FFE082] via-[#FFA000] to-[#E65100] border-2 border-[#5D2B03] shadow-[0_2px_0_#3E1B02,inset_0_2px_0_rgba(255,255,255,0.7)] flex items-center justify-center transition-transform group-hover:scale-105 shrink-0">
-            <span className="font-display text-base sm:text-xl text-white drop-shadow-[0_2px_0_#7F2A00]">
-              I
-            </span>
-          </div>
-          <div className="flex flex-col min-w-0">
-            <div
-              className="game-text-stroke text-base sm:text-xl font-normal tracking-wide leading-tight truncate"
-              style={{ fontWeight: 'normal' }}
-            >
-              Imaginiv
-            </div>
-          </div>
+          <img
+            src={BRAND_ASSETS.logoUrl}
+            alt="Imaginiv"
+            className="h-7 sm:h-8 md:h-9 w-auto max-w-[140px] sm:max-w-[170px] object-contain transition-transform group-hover:scale-105"
+          />
         </Link>
 
         {/* Desktop Navigation Tabs (Wooden Game UI Buttons) */}
@@ -212,9 +200,11 @@ export const Header: React.FC = () => {
                 <div className="absolute bottom-2 right-12 game-nail" />
 
                 <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-[#FFE082] via-[#FFA000] to-[#E65100] border-2 border-[#5D2B03] shadow-[0_2px_0_#3E1B02] flex items-center justify-center shrink-0">
-                    <span className="font-display text-base text-white drop-shadow-[0_1px_0_#7F2A00]">I</span>
-                  </div>
+                  <img
+                    src={BRAND_ASSETS.logoUrl}
+                    alt="Imaginiv"
+                    className="h-7 w-auto object-contain"
+                  />
                 </div>
 
                 {/* Tactile Wood Close Button */}

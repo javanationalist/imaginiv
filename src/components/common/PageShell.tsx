@@ -28,8 +28,6 @@ export const PageShell: React.FC<PageShellProps> = ({ children, className = '' }
           {/* Corner Nails on Main Board */}
           <div className="absolute top-3 left-3 game-nail !w-3.5 !h-3.5" />
           <div className="absolute top-3 right-3 game-nail !w-3.5 !h-3.5" />
-          <div className="absolute bottom-3 left-3 game-nail !w-3.5 !h-3.5" />
-          <div className="absolute bottom-3 right-3 game-nail !w-3.5 !h-3.5" />
 
           {/* Parchment Paper Container holding the page content */}
           <div className="game-parchment p-5 sm:p-8 lg:p-10 rounded-2xl relative">
