@@ -6,15 +6,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
-  ArrowLeft, 
   Calendar, 
   User, 
   BookOpen, 
   Share2, 
   Check, 
   Loader2, 
-  AlertCircle,
-  Sparkles
+  AlertCircle
 } from 'lucide-react';
 import { PageShell } from '../components/common/PageShell';
 import { ArticleItem } from '../types';
@@ -142,9 +140,8 @@ export const ArticleDetailPage: React.FC = () => {
           <div className="pt-4">
             <Link
               to="/article"
-              className="game-btn-blue text-sm font-display tracking-wide inline-flex items-center gap-2 px-6 py-3 cursor-pointer"
+              className="game-btn-blue text-sm font-display tracking-wide inline-flex items-center justify-center px-6 py-3 cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4" />
               <span>Back to All Articles</span>
             </Link>
           </div>
@@ -160,9 +157,8 @@ export const ArticleDetailPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-6 border-b-2 border-[#D6BC90] mb-8">
         <Link
           to="/article"
-          className="game-btn-wood text-xs sm:text-sm !py-2 !px-4 inline-flex items-center gap-2 cursor-pointer shadow-sm"
+          className="game-btn-wood text-xs sm:text-sm !py-2 !px-4 inline-flex items-center justify-center cursor-pointer shadow-sm"
         >
-          <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
           <span>Back to Articles</span>
         </Link>
 
@@ -261,9 +257,8 @@ export const ArticleDetailPage: React.FC = () => {
 
           <Link
             to="/article"
-            className="game-btn-blue text-sm font-display tracking-wide inline-flex items-center gap-2 px-6 py-2.5 cursor-pointer shadow-md"
+            className="game-btn-blue text-sm font-display tracking-wide inline-flex items-center justify-center px-6 py-2.5 cursor-pointer shadow-md"
           >
-            <ArrowLeft className="w-4 h-4" />
             <span>Back to All Articles</span>
           </Link>
         </div>

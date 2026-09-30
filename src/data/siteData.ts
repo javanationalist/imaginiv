@@ -303,7 +303,7 @@ export const BEING_CREATIVE_TENETS: CreativeTenet[] = [
     title: 'Create What Brings Warmth to the World',
     concept: 'Media shapes culture. Use your talent to foster wonder, healing, community resilience, and deeper understanding between strangers.',
     actionableTip: 'Choose projects that leave communities stronger, more informed, and more connected than before.',
-    iconName: 'Sparkles',
+    iconName: 'Sun',
     colorScheme: 'orange'
   }
 ];
@@ -483,7 +483,7 @@ export const INCLUSIVITY_PRINCIPLES: InclusivityPrinciple[] = [
       'Quiet studio workspaces and asynchronous collaboration options for deep focus.',
       'Clear, predictable navigation patterns and plain-language project descriptions.'
     ],
-    iconName: 'Sparkles',
+    iconName: 'HeartHandshake',
     colorScheme: 'blue'
   }
 ];

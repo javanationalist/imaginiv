@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, Sparkles, Moon, ArrowLeft } from 'lucide-react';
+import { Moon } from 'lucide-react';
 import { PageShell } from '../components/common/PageShell';
 
 export interface PageUnavailablePageProps {
@@ -22,9 +22,6 @@ export const PageUnavailablePage: React.FC<PageUnavailablePageProps> = ({
         <div className="relative inline-block mb-6">
           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-b from-[#FFE082] via-[#FFA000] to-[#E65100] border-3 border-[#5D2B03] shadow-[0_6px_0_#3E1B02,inset_0_2px_0_rgba(255,255,255,0.7)] flex items-center justify-center mx-auto">
             <Moon className="w-10 h-10 sm:w-12 sm:h-12 text-white drop-shadow-[0_2px_0_#7F2A00]" />
-          </div>
-          <div className="absolute -top-1 -right-1 p-1.5 bg-[#4A2408] text-amber-300 rounded-full border-2 border-white shadow-sm">
-            <Sparkles className="w-4 h-4 animate-spin" />
           </div>
         </div>
 
@@ -45,16 +42,14 @@ export const PageUnavailablePage: React.FC<PageUnavailablePageProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             to="/#directory"
-            className="game-btn-blue text-sm sm:text-base font-display !py-3 !px-6 flex items-center gap-2 cursor-pointer w-full sm:w-auto justify-center"
+            className="game-btn-blue text-sm sm:text-base font-display !py-3 !px-6 flex items-center justify-center cursor-pointer w-full sm:w-auto"
           >
-            <Compass className="w-5 h-5 text-white" />
             <span>Return to Village Directory</span>
           </Link>
           <Link
             to="/"
-            className="game-btn-wood text-sm sm:text-base font-display !py-3 !px-6 flex items-center gap-2 cursor-pointer w-full sm:w-auto justify-center"
+            className="game-btn-wood text-sm sm:text-base font-display !py-3 !px-6 flex items-center justify-center cursor-pointer w-full sm:w-auto"
           >
-            <ArrowLeft className="w-5 h-5 text-white" />
             <span>Village Homepage</span>
           </Link>
         </div>

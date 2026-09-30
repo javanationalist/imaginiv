@@ -9,45 +9,22 @@
 
 /**
  * Returns the current application base path without a trailing slash.
- * Examples:
- * - On GitHub Pages (https://javanationalist.github.io/imaginiv/article/slug) -> "/imaginiv"
- * - On Custom Domain (https://imaginiv.site/article/slug) -> ""
- * - On Root / Preview (https://ais-dev-...run.app/article/slug) -> ""
+ * Derived dynamically from Vite's BASE_URL configuration.
+ * For root deployments (such as custom domains and root preview environments), returns empty string "".
+ * For subdirectory deployments configured via VITE_BASE_PATH, returns the configured path without trailing slash.
  */
 export const getAppBasePath = (): string => {
-  if (typeof window === 'undefined') return '';
-
-  const pathname = window.location.pathname;
-
-  // 1. Check if current pathname starts with /imaginiv (subdirectory deployment)
-  if (pathname.startsWith('/imaginiv')) {
-    return '/imaginiv';
-  }
-
-  // 2. Check Vite's configured BASE_URL if present
   const rawBase = typeof import.meta !== 'undefined' && import.meta.env ? (import.meta.env.BASE_URL || '/') : '/';
-  const viteBase = rawBase.replace(/\/$/, '');
-  if (viteBase && viteBase !== '/' && pathname.startsWith(viteBase)) {
-    return viteBase;
+  const cleanBase = rawBase.replace(/\/$/, '');
+  if (cleanBase && cleanBase !== '/') {
+    return cleanBase;
   }
-
-  // 3. Fallback: inspect pathname segments before '/article' or other route paths
-  const segments = pathname.split('/').filter(Boolean);
-  const articleIndex = segments.indexOf('article');
-  if (articleIndex > 0) {
-    return '/' + segments.slice(0, articleIndex).join('/');
-  }
-
   return '';
 };
 
 /**
  * Generates an absolute, deployment-independent share URL for an article.
  * Dynamically uses the current browser origin and application base path without hardcoding any domain or subdirectory.
- *
- * Examples:
- * - GitHub Pages: https://javanationalist.github.io/imaginiv/article/contoh-artikel
- * - Custom Domain: https://imaginiv.site/article/contoh-artikel
  *
  * @param slug The article slug (e.g. "contoh-artikel")
  * @returns Absolute URL string suitable for copying to clipboard or sharing

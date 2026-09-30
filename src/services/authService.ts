@@ -5,6 +5,7 @@
 
 import { getSupabaseClient, isSupabaseConfigured } from './supabase';
 import { VillageUser } from '../types';
+import { getAppBasePath } from '../utils/urlUtils';
 
 const MOCK_AUTH_STORAGE_KEY = 'framedia_village_admin_session';
 
@@ -85,7 +86,8 @@ export const authService = {
     }
 
     try {
-      const targetRedirect = redirectTo || `${window.location.origin}/admin`;
+      const basePath = getAppBasePath();
+      const targetRedirect = redirectTo || `${window.location.origin}${basePath}/admin`;
 
       const { data, error } = await client.auth.signInWithOAuth({
         provider: 'google',

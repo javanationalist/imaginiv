@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BannerItem } from '../../types';
-import { bannersService, DEFAULT_BANNERS } from '../../services/bannersService';
+import { bannersService } from '../../services/bannersService';
 
 export interface BannerSectionProps {
   autoRotateInterval?: number; // default 7000ms (7s)
@@ -15,12 +15,9 @@ export interface BannerSectionProps {
 
 /**
  * BannerSection:
- * Full-bleed edge-to-edge layout:
- * - Spans 100vw touching absolute left and right edges of the browser viewport
- * - 16:9 aspect ratio matching 1920x1080 banner images proportionally without distortion
- * - Image starts directly at the top (object-top) with zero empty space above
- * - Upper portion of the original banner is prioritized and clearly visible
- * - Text overlay formatted cleanly with high contrast dropshadows
+ * - Only renders real active banners from Supabase.
+ * - If Supabase contains zero active banners, request fails, or offline: renders nothing (null).
+ * - Full-bleed edge-to-edge layout when active banners exist.
  */
 export const BannerSection: React.FC<BannerSectionProps> = ({
   autoRotateInterval = 7000,
@@ -31,7 +28,6 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const nextPreloadRef = useRef<HTMLImageElement | null>(null);
 
-  // Load active banners and subscribe to real-time updates
   useEffect(() => {
     let isMounted = true;
 
@@ -43,8 +39,11 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
           setIsLoaded(true);
         }
       } catch (err) {
-        console.error('Failed to load active banners:', err);
-        if (isMounted) setIsLoaded(true);
+        console.error('Failed to load active banners from Supabase:', err);
+        if (isMounted) {
+          setBanners([]);
+          setIsLoaded(true);
+        }
       }
     };
 
@@ -62,45 +61,44 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
     };
   }, []);
 
-  const displayBanners = banners.length > 0 ? banners : DEFAULT_BANNERS.filter((b) => b.is_active);
-
   // Safe index bounds
   useEffect(() => {
-    if (displayBanners.length === 0) {
+    if (banners.length === 0) {
       setCurrentIndex(0);
-    } else if (currentIndex >= displayBanners.length) {
+    } else if (currentIndex >= banners.length) {
       setCurrentIndex(0);
     }
-  }, [displayBanners.length, currentIndex]);
+  }, [banners.length, currentIndex]);
 
   // Preload next image to eliminate flicker during crossfade
   useEffect(() => {
-    if (displayBanners.length <= 1) return;
-    const nextIdx = (currentIndex + 1) % displayBanners.length;
-    const nextUrl = displayBanners[nextIdx]?.image_url;
+    if (banners.length <= 1) return;
+    const nextIdx = (currentIndex + 1) % banners.length;
+    const nextUrl = banners[nextIdx]?.image_url;
     if (nextUrl) {
       const img = new Image();
       img.src = nextUrl;
       nextPreloadRef.current = img;
     }
-  }, [currentIndex, displayBanners]);
+  }, [currentIndex, banners]);
 
   // Auto-rotate crossfade
   useEffect(() => {
-    if (displayBanners.length <= 1) return;
+    if (banners.length <= 1) return;
 
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % displayBanners.length);
+      setCurrentIndex((prev) => (prev + 1) % banners.length);
     }, autoRotateInterval);
 
     return () => clearInterval(timer);
-  }, [displayBanners.length, autoRotateInterval]);
+  }, [banners.length, autoRotateInterval]);
 
-  if (!isLoaded && displayBanners.length === 0) {
+  // If not yet loaded or no active banners exist in Supabase, render nothing at all
+  if (!isLoaded || banners.length === 0) {
     return null;
   }
 
-  const currentBanner = displayBanners[currentIndex] || displayBanners[0];
+  const currentBanner = banners[currentIndex] || banners[0];
   if (!currentBanner) return null;
 
   return (
@@ -137,7 +135,7 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
         {/* 3. LAYER: CONTENT CONTAINER WITH TEXT OVERLAY */}
         <div className="absolute inset-0 w-full h-full max-w-[1240px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-start z-10 pointer-events-none">
           <div className="w-full sm:max-w-xl lg:max-w-2xl py-3 sm:py-6 pointer-events-auto">
-            {/* Big White Headline: Studio Name */}
+            {/* Headline: Studio Name */}
             <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl text-white tracking-wide uppercase leading-tight drop-shadow-[0_3px_8px_rgba(0,0,0,0.9)] mb-1 sm:mb-2">
               Imaginiv
             </h1>
@@ -155,9 +153,9 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
         </div>
 
         {/* 4. DISCREET CORNER DOTS INDICATOR (BOTTOM RIGHT) */}
-        {displayBanners.length > 1 && (
+        {banners.length > 1 && (
           <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-6 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs border border-white/15 pointer-events-none">
-            {displayBanners.map((_, dotIdx) => (
+            {banners.map((_, dotIdx) => (
               <span
                 key={dotIdx}
                 className={`transition-all duration-300 rounded-full ${

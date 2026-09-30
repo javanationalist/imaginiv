@@ -10,7 +10,7 @@ class SoundManager {
 
   constructor() {
     // Check localStorage if user previously enabled sound
-    const saved = localStorage.getItem('village_sound_enabled');
+    const saved = typeof window !== 'undefined' && typeof localStorage !== 'undefined' ? localStorage.getItem('village_sound_enabled') : null;
     this.enabled = saved === 'true';
   }
 

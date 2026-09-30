@@ -26,7 +26,7 @@ import {
   Loader2,
   Compass,
   Check,
-  Sparkles,
+  Info,
   BookOpen
 } from 'lucide-react';
 import { authService } from '../services/authService';
@@ -308,7 +308,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <div className="my-6 space-y-4">
                       {/* Notice Banner */}
                       <div className="p-4 bg-gradient-to-r from-[#FFF8EC] to-[#FCEECC] rounded-xl border border-[#D6BC90] flex items-start gap-3">
-                        <Sparkles className="w-5 h-5 text-[#E8863A] shrink-0 mt-0.5" />
+                        <Info className="w-5 h-5 text-[#E8863A] shrink-0 mt-0.5" />
                         <div className="text-xs sm:text-sm text-[#5E3A1A] leading-relaxed font-semibold">
                           Toggling a page switch immediately updates the database. Deactivated pages disappear from the Navbar and Directory for <strong>ALL visitors</strong>, and direct URLs display a stylized "Page Unavailable" notice instead of a 404 error.
                         </div>

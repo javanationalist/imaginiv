@@ -11,7 +11,6 @@ import {
   Calendar, 
   User, 
   ArrowRight, 
-  Sparkles, 
   Loader2,
   FileText
 } from 'lucide-react';

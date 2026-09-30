@@ -26,12 +26,18 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export default function App() {
-  // Use /imaginiv basename if current path starts with /imaginiv (e.g. GitHub Pages deployment)
-  // Otherwise use default root basename so AI Studio dev preview and root deployments do not render blank
-  const basename =
-    typeof window !== 'undefined' && window.location.pathname.startsWith('/imaginiv')
-      ? '/imaginiv'
-      : undefined;
+  // Purge any legacy demo banner or demo article caches from localStorage
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    localStorage.removeItem('framedia_banners_list');
+    localStorage.removeItem('framedia_articles_list');
+  }
+
+  // Dynamic basename resolution:
+  // Derived from Vite's BASE_URL (configured via VITE_BASE_PATH in vite.config.ts).
+  // For custom domain root (https://imaginiv.site/) and preview environments, BASE_URL is '/', so basename is undefined.
+  const rawBase = typeof import.meta !== 'undefined' && import.meta.env ? (import.meta.env.BASE_URL || '/') : '/';
+  const cleanBase = rawBase.replace(/\/$/, '');
+  const basename = cleanBase && cleanBase !== '/' ? cleanBase : undefined;
 
   return (
     <ThemeProvider>

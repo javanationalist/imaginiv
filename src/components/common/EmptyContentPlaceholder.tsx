@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Sparkles, Hammer, Clock } from 'lucide-react';
+import { Hammer, Clock } from 'lucide-react';
 
 export interface EmptyContentPlaceholderProps {
   pageName: string;

@@ -22,10 +22,10 @@ export const DemoLoadingState: React.FC = () => {
         </div>
 
         <h3 className="font-display text-lg sm:text-xl text-[#381E0A] font-bold tracking-wide mb-1">
-          Waiting for update...
+          Curating Atelier Content...
         </h3>
         <p className="text-xs sm:text-sm text-[#7C471E] font-medium max-w-md">
-          This section is currently in demo mode. Ready for database sync.
+          This sector is being prepared for upcoming publication by Imaginiv.
         </p>
       </div>
 

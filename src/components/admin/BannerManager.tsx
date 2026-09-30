@@ -12,7 +12,6 @@ import {
   Check, 
   AlertCircle, 
   Loader2, 
-  Sparkles, 
   Eye, 
   EyeOff, 
   Image as ImageIcon, 
@@ -238,7 +237,7 @@ export const BannerManager: React.FC = () => {
       <div className="p-4 sm:p-5 bg-gradient-to-r from-[#FFF8EC] to-[#FCEECC] rounded-2xl border-2 border-[#D6BC90] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-[#FFF5E0] to-[#EADBBD] border border-[#542E10] flex items-center justify-center text-[#8B5226] shrink-0 shadow-xs">
-            <Sparkles className="w-5 h-5 text-[#E8863A]" />
+            <ImageIcon className="w-5 h-5 text-[#E8863A]" />
           </div>
           <div>
             <h3 className="font-display text-base text-[#381E0A]">

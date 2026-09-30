@@ -19,7 +19,6 @@ import {
   FileText, 
   RefreshCw, 
   RotateCcw,
-  Sparkles,
   Link as LinkIcon,
   ExternalLink
 } from 'lucide-react';
@@ -711,7 +710,7 @@ export const ArticleManager: React.FC = () => {
                     disabled={saving}
                     className="game-btn-blue text-xs sm:text-sm !py-2.5 !px-4 w-full inline-flex items-center justify-center gap-2 cursor-pointer shadow-md"
                   >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                     <span>Save &amp; Publish</span>
                   </button>
 

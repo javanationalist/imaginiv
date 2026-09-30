@@ -10,7 +10,7 @@ import {
   ChevronRight, 
   Pause, 
   Play, 
-  Sparkles,
+  Loader2,
   ArrowDown
 } from 'lucide-react';
 import { BannerItem } from '../../types';
@@ -177,7 +177,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({
         } flex flex-col items-center justify-center relative p-6 animate-pulse ${className}`}
       >
         <div className="w-12 h-12 rounded-2xl bg-[#E8D4B4] flex items-center justify-center text-[#B08A5E] mb-3">
-          <Sparkles className="w-6 h-6 animate-spin" />
+          <Loader2 className="w-6 h-6 animate-spin" />
         </div>
         <div className="h-4 w-48 bg-[#DDC39C] rounded-full mb-2" />
         <div className="h-3 w-32 bg-[#EAD5B7] rounded-full" />
@@ -287,7 +287,6 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({
       {/* Top Banner Tag / Slide Counter */}
       <div className="absolute top-3 sm:top-4 left-4 z-20 flex items-center gap-2">
         <div className="game-wood-pill text-[10px] sm:text-xs font-bold px-2.5 py-0.5 flex items-center gap-1.5 shadow-md">
-          <Sparkles className="w-3 h-3 text-[#FFD452]" />
           <span>Atelier Showcase</span>
         </div>
         <div className="bg-black/60 backdrop-blur-xs text-white text-[10px] sm:text-xs font-mono font-bold px-2 py-0.5 rounded-full border border-white/20">

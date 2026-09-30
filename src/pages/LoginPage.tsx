@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, KeyRound, Mail, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import { KeyRound, Mail, AlertCircle, Loader2 } from 'lucide-react';
 import { authService } from '../services/authService';
 import { ForestBackdrop } from '../components/common/VillageArtwork';
 
@@ -109,9 +109,8 @@ export const LoginPage: React.FC = () => {
       <div className="mb-6 relative z-10">
         <Link
           to="/"
-          className="game-btn-wood text-xs sm:text-sm !py-2 !px-4 inline-flex items-center gap-2"
+          className="game-btn-wood text-xs sm:text-sm !py-2 !px-4 inline-flex items-center justify-center"
         >
-          <ArrowLeft className="w-4 h-4 text-white" strokeWidth={2.5} />
           <span>Return to Village Map</span>
         </Link>
       </div>
@@ -255,7 +254,6 @@ export const LoginPage: React.FC = () => {
               onClick={handleFillDemo}
               className="text-xs font-bold text-[#146FBF] hover:underline cursor-pointer inline-flex items-center gap-1"
             >
-              <Sparkles className="w-3.5 h-3.5" />
               <span>Fill Demo Credentials (Admin)</span>
             </button>
           </div>

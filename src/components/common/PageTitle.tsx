@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Compass } from 'lucide-react';
 
 export interface PageTitleProps {
   title: string;
@@ -28,7 +27,6 @@ export const PageTitle: React.FC<PageTitleProps> = ({
             to="/"
             className="hover:text-[#2F8FE0] transition-colors inline-flex items-center gap-1.5 touch-target font-display"
           >
-            <Compass className="w-4 h-4 text-[#8B5226]" />
             <span>Creative Village</span>
           </Link>
           <span className="text-[#381E0A]/40 font-bold">/</span>
@@ -37,9 +35,8 @@ export const PageTitle: React.FC<PageTitleProps> = ({
 
         <Link
           to="/"
-          className="game-btn-wood !py-1.5 !px-3.5 !min-h-[38px] text-xs sm:text-sm inline-flex items-center gap-2 shadow-[0_3px_0_#2A1202]"
+          className="game-btn-wood !py-1.5 !px-3.5 !min-h-[38px] text-xs sm:text-sm inline-flex items-center justify-center shadow-[0_3px_0_#2A1202]"
         >
-          <ArrowLeft className="w-4 h-4 text-white" strokeWidth={2.5} />
           <span>Back to Village Map</span>
         </Link>
       </div>
