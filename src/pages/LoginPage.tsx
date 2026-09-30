@@ -118,8 +118,16 @@ export const LoginPage: React.FC = () => {
 
         {/* Top Plaque Header */}
         <div className="game-wood-plank -mt-7 sm:-mt-9 mx-auto max-w-xs py-2 px-4 text-center shadow-[0_4px_0_#2B1302]">
-          <h1 className="game-text-title text-xl sm:text-2xl uppercase tracking-wider">
-            Village Gate
+          <h1
+            className="font-display text-xl sm:text-2xl uppercase tracking-wider text-white border-none outline-none"
+            style={{
+              WebkitTextStroke: '0px transparent',
+              textShadow: 'none',
+              outline: 'none',
+              borderStyle: 'none',
+            }}
+          >
+            Stop. Who R U?
           </h1>
         </div>
 
@@ -181,22 +189,22 @@ export const LoginPage: React.FC = () => {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Entering Gate...</span>
+                  <span>Logging in...</span>
                 </>
               ) : (
-                <span>ENTER ATELIER</span>
+                <span>Login</span>
               )}
             </button>
           </form>
 
-          {/* Divider: "or continue with" */}
+          {/* Divider: "or" */}
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t-2 border-[#D6BC90]/70" />
             </div>
             <div className="relative flex justify-center text-[11px] uppercase">
               <span className="bg-[#F7EBD3] px-3 font-bold text-[#8C6B4E] tracking-wider rounded-full">
-                or continue with
+                or
               </span>
             </div>
           </div>

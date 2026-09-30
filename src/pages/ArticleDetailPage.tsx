@@ -11,7 +11,6 @@ import {
   BookOpen, 
   Share2, 
   Check, 
-  Loader2, 
   AlertCircle
 } from 'lucide-react';
 import { PageShell } from '../components/common/PageShell';
@@ -20,6 +19,8 @@ import { articlesService } from '../services/articlesService';
 import { authService } from '../services/authService';
 import { MarkdownContent } from '../components/ui/MarkdownContent';
 import { getArticleShareUrl } from '../utils/urlUtils';
+import { ArticleDetailSkeleton } from '../components/articles/ArticleSkeleton';
+import { ArticleReadingProgressBar } from '../components/articles/ArticleReadingProgressBar';
 
 export const ArticleDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -106,16 +107,11 @@ export const ArticleDetailPage: React.FC = () => {
     }
   };
 
-  // 1. LOADING STATE
+  // 1. SKELETON LOADING STATE
   if (loading) {
     return (
       <PageShell>
-        <div className="py-24 text-center space-y-4">
-          <Loader2 className="w-12 h-12 text-[#2F8FE0] animate-spin mx-auto" />
-          <div className="font-display text-lg text-[#381E0A]">
-            Opening article manuscript...
-          </div>
-        </div>
+        <ArticleDetailSkeleton />
       </PageShell>
     );
   }
@@ -153,26 +149,29 @@ export const ArticleDetailPage: React.FC = () => {
   // 3. ARTICLE DETAIL DISPLAY
   return (
     <PageShell>
+      {/* Subtle Stylized Reading Progress Bar */}
+      <ArticleReadingProgressBar targetSelector="#article-manuscript" />
+
       {/* Top Back Navigation Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-6 border-b-2 border-[#D6BC90] mb-8">
+      <div className="flex items-center justify-between gap-2 sm:gap-4 pb-4 sm:pb-6 border-b-2 border-[#D6BC90] mb-6 sm:mb-8 w-full">
         <Link
           to="/article"
-          className="game-btn-wood text-xs sm:text-sm !py-2 !px-4 inline-flex items-center justify-center cursor-pointer shadow-sm"
+          className="game-btn-wood text-xs sm:text-sm !py-2 !px-3 sm:!px-4 inline-flex items-center justify-center shrink-0 cursor-pointer shadow-sm"
         >
           <span>Back to Articles</span>
         </Link>
 
-        <div className="flex items-center gap-2 self-end sm:self-auto">
+        <div className="flex items-center gap-2 shrink-0">
           {!article.is_published && (
-            <span className="text-xs font-bold text-[#C62828] bg-[#FFEBEE] px-3 py-1 rounded-full border border-[#FFCDD2]">
-              Draft Mode (Admin Preview Only)
+            <span className="hidden sm:inline-block text-xs font-bold text-[#C62828] bg-[#FFEBEE] px-2.5 py-1 rounded-full border border-[#FFCDD2]">
+              Draft Mode
             </span>
           )}
 
           <button
             type="button"
             onClick={handleCopyLink}
-            className="game-btn-wood text-xs !py-1.5 !px-3 inline-flex items-center gap-1.5 cursor-pointer"
+            className="game-btn-wood text-xs sm:text-sm !py-2 !px-3 sm:!px-3.5 inline-flex items-center gap-1.5 shrink-0 cursor-pointer"
             title="Copy article URL"
           >
             {copied ? (
@@ -191,7 +190,7 @@ export const ArticleDetailPage: React.FC = () => {
       </div>
 
       {/* Main Article Document */}
-      <article className="max-w-4xl mx-auto">
+      <article id="article-manuscript" className="max-w-4xl mx-auto">
         <div className="space-y-3 mb-6">
           <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl text-[#381E0A] leading-tight">
             {article.title}

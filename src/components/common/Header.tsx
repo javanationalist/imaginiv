@@ -100,7 +100,8 @@ export const Header: React.FC = () => {
           <img
             src={BRAND_ASSETS.logoUrl}
             alt="Imaginiv"
-            className="h-7 sm:h-8 md:h-9 w-auto max-w-[140px] sm:max-w-[170px] object-contain transition-transform group-hover:scale-105"
+            className="object-contain transition-transform group-hover:scale-105"
+            style={{ width: '150px', height: '50px' }}
           />
         </Link>
 
@@ -141,16 +142,6 @@ export const Header: React.FC = () => {
         {/* Right side: Smurf Blue Admin Button & Mobile Menu Toggle (Hidden on PC device) */}
         <div className="flex md:hidden items-center gap-2 shrink-0 pr-1 sm:pr-2">
           {/* Admin Button - Game Blue 3D Button (Visible on mobile, hidden on PC) */}
-          <Link
-            to={currentUser ? "/admin" : "/login"}
-            id="header-admin-btn"
-            className="game-btn-blue text-xs sm:text-sm !py-1.5 sm:!py-2 !px-2.5 sm:!px-3.5 !min-h-[40px] sm:!min-h-[42px] gap-1.5 shadow-[0_3px_0_#093764] flex md:hidden items-center shrink-0"
-            title={currentUser ? "Admin CMS Dashboard" : "Admin Portal Sign-In"}
-          >
-            <Shield className="w-4 h-4 text-amber-200 shrink-0" strokeWidth={2.5} />
-            <span className="hidden sm:inline">{currentUser ? "Dashboard" : "Admin"}</span>
-          </Link>
-
           {/* Mobile hamburger button: Hidden on desktop/PC, visible on mobile */}
           <button
             type="button"
@@ -273,8 +264,7 @@ export const Header: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full game-btn-blue text-sm !py-2.5 flex items-center justify-center gap-2 min-h-[44px] shadow-[0_3px_0_#093764]"
                 >
-                  <Shield className="w-4 h-4 text-amber-200" strokeWidth={2.5} />
-                  <span className="font-display tracking-wide">{currentUser ? "Admin CMS Dashboard" : "Admin Login Portal"}</span>
+                  <span className="font-display tracking-wide">{currentUser ? "Dashboard" : "Login"}</span>
                 </Link>
 
                 <div className="text-[10px] font-bold text-[#D6BC90]/70 text-center tracking-wider uppercase font-sans">

@@ -11,13 +11,13 @@ import {
   Calendar, 
   User, 
   ArrowRight, 
-  Loader2,
   FileText
 } from 'lucide-react';
 import { PageShell } from '../components/common/PageShell';
 import { PageTitle } from '../components/common/PageTitle';
 import { ArticleItem } from '../types';
 import { articlesService } from '../services/articlesService';
+import { ArticleListSkeleton } from '../components/articles/ArticleSkeleton';
 
 export const ArticleListPage: React.FC = () => {
   const [articles, setArticles] = useState<ArticleItem[]>([]);
@@ -107,12 +107,7 @@ export const ArticleListPage: React.FC = () => {
 
       {/* 3. Articles Grid / Loading / Empty States */}
       {loading ? (
-        <div className="py-16 text-center space-y-4">
-          <Loader2 className="w-10 h-10 text-[#2F8FE0] animate-spin mx-auto" />
-          <div className="font-display text-base text-[#381E0A]">
-            Gathering village publications...
-          </div>
-        </div>
+        <ArticleListSkeleton count={6} />
       ) : filteredArticles.length === 0 ? (
         <div className="p-8 sm:p-12 text-center bg-[#FAF2DF] rounded-2xl border-2 border-dashed border-[#D6BC90] my-6">
           <FileText className="w-12 h-12 text-[#C0A87A] mx-auto mb-3" />

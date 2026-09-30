@@ -362,8 +362,8 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({
               onClick={onCtaClick}
               className="game-btn-blue text-xs sm:text-sm !py-2.5 !px-6 inline-flex items-center gap-2 cursor-pointer shadow-lg"
             >
-              <span>EXPLORE DIRECTORY</span>
-              <ArrowDown className="w-4 h-4 animate-bounce" strokeWidth={2.5} />
+              <span>Explore</span>
+              <ArrowDown className="w-4 h-4" strokeWidth={2.5} />
             </button>
           </div>
         )}

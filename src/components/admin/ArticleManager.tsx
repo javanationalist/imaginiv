@@ -27,6 +27,7 @@ import { articlesService } from '../../services/articlesService';
 import { Modal } from '../common/Modal';
 import { MarkdownContent } from '../ui/MarkdownContent';
 import { getArticleShareUrl, getAppBasePath } from '../../utils/urlUtils';
+import { ArticleAdminRowSkeleton } from '../articles/ArticleSkeleton';
 
 type EditorTab = 'write' | 'preview';
 
@@ -344,10 +345,7 @@ export const ArticleManager: React.FC = () => {
 
           {/* List Table / Cards */}
           {loading ? (
-            <div className="py-16 text-center space-y-3">
-              <Loader2 className="w-8 h-8 text-[#2F8FE0] animate-spin mx-auto" />
-              <div className="text-sm font-bold text-[#7C471E]">Loading articles archive...</div>
-            </div>
+            <ArticleAdminRowSkeleton count={4} />
           ) : articles.length === 0 ? (
             <div className="p-10 text-center bg-[#FAF2DF] rounded-2xl border-2 border-dashed border-[#D6BC90]">
               <FileText className="w-12 h-12 text-[#C0A87A] mx-auto mb-2" />

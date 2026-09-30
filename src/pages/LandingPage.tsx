@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState } from 'react';
 import { 
   ArrowDown, 
   Search, 
   Compass, 
-  ArrowUp, 
   X
 } from 'lucide-react';
 import { Header } from '../components/common/Header';
@@ -21,22 +19,7 @@ import { usePageVisibility } from '../context/PageVisibilityContext';
 
 export const LandingPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [showBackToTop, setShowBackToTop] = useState(false);
   const { isPageVisible, loading } = usePageVisibility();
-
-  // Back to top scroll listener (shows after >350px scroll)
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 350);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   const scrollToDirectory = () => {
     const el = document.getElementById('directory');
@@ -188,8 +171,8 @@ export const LandingPage: React.FC = () => {
           onClick={scrollToDirectory}
           className="game-btn-blue text-base sm:text-lg font-display tracking-wide inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 sm:py-4 cursor-pointer justify-center shadow-[0_6px_0_#14436E,0_12px_24px_rgba(0,0,0,0.35)] hover:scale-105 active:scale-95 transition-transform"
         >
-          <span>EXPLORE DIRECTORY</span>
-          <ArrowDown className="w-5 h-5 animate-bounce" strokeWidth={2.5} />
+          <span>Explore</span>
+          <ArrowDown className="w-5 h-5" strokeWidth={2.5} />
         </button>
       </div>
 
@@ -198,7 +181,7 @@ export const LandingPage: React.FC = () => {
         {/* 3. DIRECTORY (id="directory")
             Styled as the Village Map Board:
             - Grand wood board
-            - Header wooden plank "VILLAGE MAP &bull; SECTORS DIRECTORY"
+            - Header wooden plank "DIRECTORY"
             - Real-time search bar
             - 7 Destination Cards
         */}
@@ -212,8 +195,14 @@ export const LandingPage: React.FC = () => {
             <div className="game-wood-plank -mt-8 sm:-mt-11 mx-auto max-w-sm sm:max-w-md py-2 px-6 text-center relative z-20 shadow-[0_5px_0_#2B1302]">
               <div className="absolute top-2 left-3 game-nail" />
               <div className="absolute top-2 right-3 game-nail" />
-              <h2 className="game-text-title text-xl sm:text-2xl uppercase tracking-wider">
-                Village Directory
+              <h2
+                className="font-display text-xl sm:text-2xl uppercase tracking-wider text-white"
+                style={{
+                  WebkitTextStroke: '0px transparent',
+                  textShadow: '0 3px 6px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4)',
+                }}
+              >
+                Directory
               </h2>
             </div>
 
@@ -222,14 +211,14 @@ export const LandingPage: React.FC = () => {
               {/* Real-time Search Input on Parchment */}
               <div className="w-full md:w-80 relative">
                 <label htmlFor="directory-search-input" className="sr-only">
-                  Search village destinations
+                  Search directory
                 </label>
                 <input
                   id="directory-search-input"
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search village map..."
+                  placeholder="Search directory..."
                   className="w-full bg-[#FFFDF7] text-[#381E0A] placeholder-[#8C6B4E] text-sm font-bold pl-10 pr-10 py-2.5 rounded-xl border-2 border-[#542E10] shadow-[inset_0_2px_4px_rgba(0,0,0,0.15),0_2px_0_#381E0A] focus:outline-none focus:ring-2 focus:ring-[#2F8FE0] min-h-[44px]"
                 />
                 <Search className="w-4 h-4 text-[#8C6B4E] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" strokeWidth={2.5} />
@@ -263,15 +252,12 @@ export const LandingPage: React.FC = () => {
                 <h3 className="font-display text-2xl text-[#381E0A] mb-2">
                   No village destinations found for "{searchQuery}"
                 </h3>
-                <p className="text-sm text-[#6B492B] font-semibold mb-5 max-w-md mx-auto">
-                  Try searching for 'cinema', 'portfolio', 'team', or clear the search to view all 7 village sectors.
-                </p>
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="game-btn-blue text-xs font-display py-2 px-5"
+                  className="game-btn-blue text-xs font-display py-2 px-5 mt-3"
                 >
-                  Reset Map Filter
+                  Reset Filter
                 </button>
               </div>
             ) : (
@@ -287,27 +273,6 @@ export const LandingPage: React.FC = () => {
 
       {/* 4. FOOTER (id="footer") */}
       <Footer />
-
-      {/* 5. BACK TO TOP BUTTON (id="back_to_top_button")
-          Round wooden disc button with arrow
-      */}
-      <AnimatePresence>
-        {showBackToTop && (
-          <motion.button
-            id="back_to_top_button"
-            type="button"
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            initial={{ opacity: 0, scale: 0.8, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 16 }}
-            transition={{ duration: 0.15 }}
-            className="fixed bottom-6 right-6 z-50 game-wood-circle-btn !w-14 !h-14 text-white shadow-[0_6px_0_#2B1302,0_12px_24px_rgba(0,0,0,0.4)]"
-          >
-            <ArrowUp className="w-7 h-7 text-white drop-shadow-[0_2px_0_#2B1302]" strokeWidth={3} />
-          </motion.button>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

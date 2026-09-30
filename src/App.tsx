@@ -5,6 +5,7 @@
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ScrollToTop } from './components/common/ScrollToTop';
+import { BackToTopButton } from './components/common/BackToTopButton';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { ThemeProvider } from './context/ThemeContext';
 import { PageVisibilityProvider } from './context/PageVisibilityContext';
@@ -147,6 +148,9 @@ export default function App() {
             {/* 404 System Error Page */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
+
+          {/* Global Back-To-Top Button rendered on all pages */}
+          <BackToTopButton />
         </BrowserRouter>
       </PageVisibilityProvider>
     </ThemeProvider>
