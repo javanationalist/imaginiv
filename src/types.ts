@@ -116,6 +116,7 @@ export interface ImaginersPageData {
 export interface ImaginersMember {
   id: string;
   name: string;
+  nim?: string | null;
   photo_url: string;
   picture_url?: string;
   photo_path?: string | null;

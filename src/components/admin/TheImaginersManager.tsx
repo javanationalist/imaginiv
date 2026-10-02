@@ -74,6 +74,7 @@ export const TheImaginersManager: React.FC = () => {
   // 3. Member Form states (Add / Edit)
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const [name, setName] = useState('');
+  const [nim, setNim] = useState('');
   const [role, setRole] = useState('');
   const [socialLinks, setSocialLinks] = useState<MemberSocialLink[]>([]);
   
@@ -243,6 +244,7 @@ export const TheImaginersManager: React.FC = () => {
   const resetMemberForm = () => {
     setEditingMemberId(null);
     setName('');
+    setNim('');
     setRole('');
     setSocialLinks([]);
     setSelectedFile(null);
@@ -260,6 +262,7 @@ export const TheImaginersManager: React.FC = () => {
   const handleStartEdit = (member: ImaginersMember) => {
     setEditingMemberId(member.id);
     setName(member.name || '');
+    setNim(member.nim || '');
     setRole(member.role || '');
     setSocialLinks(member.social_media ? [...member.social_media] : []);
     const photoUrl = member.photo_url || member.picture_url || '';
@@ -283,6 +286,11 @@ export const TheImaginersManager: React.FC = () => {
     // Validate required fields
     if (!name.trim()) {
       setMemberNotice({ text: 'Nama Person wajib diisi.', type: 'error' });
+      return;
+    }
+
+    if (!nim.trim()) {
+      setMemberNotice({ text: 'NIM (Nomor Induk Mahasiswa) wajib diisi.', type: 'error' });
       return;
     }
 
@@ -333,6 +341,7 @@ export const TheImaginersManager: React.FC = () => {
       if (editingMemberId) {
         const updateRes = await imaginersService.updateMember(editingMemberId, {
           name: name.trim(),
+          nim: nim.trim(),
           role: role.trim(),
           photo_url: finalPhotoUrl,
           photo_path: finalPhotoPath,
@@ -360,6 +369,7 @@ export const TheImaginersManager: React.FC = () => {
       } else {
         const createRes = await imaginersService.createMember({
           name: name.trim(),
+          nim: nim.trim(),
           role: role.trim(),
           photo_url: finalPhotoUrl,
           photo_path: finalPhotoPath,
@@ -755,7 +765,24 @@ export const TheImaginersManager: React.FC = () => {
             />
           </div>
 
-          {/* FIELD 3: ROLE DENGAN TEMPLATE PILIHAN */}
+          {/* FIELD 3: NIM (NOMOR INDUK MAHASISWA) */}
+          <div>
+            <label className="block text-xs sm:text-sm font-bold text-[#381E0A] mb-1.5">
+              NIM * <span className="text-xs font-semibold text-[#7C471E]">(Nomor Induk Mahasiswa, wajib)</span>
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={nim}
+              onChange={(e) => setNim(e.target.value)}
+              placeholder="Masukkan Nomor Induk Mahasiswa (contoh: 21010122130001)"
+              required
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF0D4] border-2 border-[#D6BC90] focus:border-[#2F8FE0] focus:outline-hidden text-sm text-[#381E0A] font-semibold transition-all shadow-inner"
+            />
+          </div>
+
+          {/* FIELD 4: ROLE DENGAN TEMPLATE PILIHAN */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs sm:text-sm font-bold text-[#381E0A]">
@@ -796,7 +823,7 @@ export const TheImaginersManager: React.FC = () => {
             </div>
           </div>
 
-          {/* FIELD 4: SOCIAL MEDIA (REPEATABLE LINKS) */}
+          {/* FIELD 5: SOCIAL MEDIA (REPEATABLE LINKS) */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs sm:text-sm font-bold text-[#381E0A]">
@@ -996,11 +1023,16 @@ export const TheImaginersManager: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Person Name & Role */}
+                    {/* Person Name, NIM & Role */}
                     <div className="min-w-0">
                       <h4 className="font-display text-sm sm:text-base text-[#381E0A] truncate leading-tight">
                         {member.name || '(Nama belum diisi)'}
                       </h4>
+                      {member.nim && (
+                        <p className="text-[11px] font-mono text-[#8C5D35] font-bold truncate">
+                          NIM: {member.nim}
+                        </p>
+                      )}
                       <p className="text-xs text-[#7C471E] font-semibold truncate mt-0.5">
                         {member.role}
                       </p>

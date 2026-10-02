@@ -557,3 +557,23 @@
     inset 0 2px 0 rgba(255, 255, 255, 0.9);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   ARTICLE CARD: STATIC HOVER BEHAVIOR (NO SCALE / NO TRANSFORM)
+   ═══════════════════════════════════════════════════════════════ */
+.article-card {
+  transform: none !important;
+  transition: box-shadow 0.2s ease-out, background-color 0.2s ease-out, border-color 0.2s ease-out;
+}
+
+.article-card:hover {
+  transform: none !important;
+  box-shadow: 0 6px 16px rgba(43, 19, 2, 0.12);
+  background-color: #FEFAF7;
+}
+
+.article-card img,
+.article-card:hover img {
+  transform: none !important;
+}
+
+

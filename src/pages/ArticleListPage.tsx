@@ -135,7 +135,7 @@ export const ArticleListPage: React.FC = () => {
             return (
               <article
                 key={article.id}
-                className="group flex flex-col justify-between rounded-2xl bg-white border-2 border-[#D6BC90] hover:border-[#8B5226] shadow-sm hover:shadow-[0_8px_0_#2B1302,0_16px_24px_rgba(0,0,0,0.15)] hover:-translate-y-1.5 transition-all duration-200 overflow-hidden"
+                className="article-card group flex flex-col justify-between rounded-2xl bg-white border-2 border-[#D6BC90] hover:border-[#8B5226] shadow-sm hover:shadow-[0_6px_16px_rgba(43,19,2,0.12)] transition-all duration-200 overflow-hidden"
               >
                 <div>
                   {/* Article Cover Image Container */}
@@ -144,7 +144,7 @@ export const ArticleListPage: React.FC = () => {
                       <img
                         src={article.cover_image_url!}
                         alt={article.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover transition-transform duration-200"
                         loading="lazy"
                       />
                     ) : (

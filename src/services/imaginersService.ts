@@ -142,6 +142,7 @@ export const imaginersService = {
         return {
           id: row.id,
           name: row.name || '',
+          nim: row.nim || null,
           photo_url: photoUrl,
           picture_url: photoUrl,
           photo_path: photoPath,
@@ -258,6 +259,7 @@ export const imaginersService = {
    */
   async createMember(data: {
     name: string;
+    nim?: string | null;
     role: string;
     photo_url: string;
     photo_path?: string | null;
@@ -284,6 +286,7 @@ export const imaginersService = {
 
       const insertPayload: Record<string, any> = {
         name: data.name.trim(),
+        nim: data.nim ? data.nim.trim() : null,
         role: data.role.trim(),
         photo_url: photoUrl,
         picture_url: photoUrl, // for backward compat with existing table schema
@@ -315,6 +318,7 @@ export const imaginersService = {
         member: {
           id: created.id,
           name: created.name || data.name.trim(),
+          nim: created.nim || (data.nim ? data.nim.trim() : null),
           photo_url: finalPhoto,
           picture_url: finalPhoto,
           photo_path: finalPath,
@@ -341,6 +345,7 @@ export const imaginersService = {
     id: string,
     data: Partial<{
       name: string;
+      nim: string | null;
       role: string;
       photo_url: string;
       photo_path: string | null;
@@ -362,6 +367,7 @@ export const imaginersService = {
       };
 
       if (data.name !== undefined) updatePayload.name = data.name.trim();
+      if (data.nim !== undefined) updatePayload.nim = data.nim ? data.nim.trim() : null;
       if (data.role !== undefined) updatePayload.role = data.role.trim();
       if (data.photo_url !== undefined) {
         updatePayload.photo_url = data.photo_url.trim();
@@ -397,6 +403,7 @@ export const imaginersService = {
         member: {
           id: updated.id,
           name: updated.name || '',
+          nim: updated.nim || null,
           photo_url: finalPhoto,
           picture_url: finalPhoto,
           photo_path: finalPath,

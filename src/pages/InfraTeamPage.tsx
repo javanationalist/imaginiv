@@ -183,12 +183,24 @@ export const InfraTeamPage: React.FC = () => {
                       </h2>
                     )}
 
-                    {/* 2. Role Beneath Name */}
+                    {/* 2. Nomor Induk Mahasiswa (Label & Value directly below) */}
+                    {member.nim && (
+                      <div className="flex flex-col items-center text-center">
+                        <span className="text-[11px] font-bold text-[#8C5D35] uppercase tracking-wider">
+                          Nomor Induk Mahasiswa
+                        </span>
+                        <span className="font-mono text-xs sm:text-sm font-extrabold text-[#381E0A] tracking-wider mt-0.5">
+                          {member.nim}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* 3. Role Beneath NIM */}
                     <p className="text-xs sm:text-sm text-[#7C471E] font-bold">
                       {member.role}
                     </p>
 
-                    {/* 3. Social Media Icons Beneath Role (Rendered only if links exist) */}
+                    {/* 4. Social Media Icons Beneath Role (Rendered only if links exist) */}
                     {member.social_media && member.social_media.length > 0 && (
                       <div className="pt-2.5 mt-1 border-t border-[#D6BC90]/60 w-full flex items-center justify-center gap-2 flex-wrap">
                         {member.social_media.map((s, idx) => {
