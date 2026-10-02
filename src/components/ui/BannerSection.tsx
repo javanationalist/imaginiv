@@ -104,7 +104,7 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
   return (
     <section
       id="hero_banner_section"
-      aria-label="Framedia Creative Visual Showcase"
+      aria-label="Imaginiv Visual Showcase"
       className={`relative w-full w-screen max-w-none left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-hidden bg-[#1F1004] p-0 m-0 ${className}`}
     >
       {/* 1. LAYER: FULL-BLEED 16:9 BANNER CONTAINER */}
@@ -120,7 +120,7 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
           >
             <img
               src={currentBanner.image_url}
-              alt={currentBanner.caption || 'Framedia Creative Banner'}
+              alt={currentBanner.caption || 'Imaginiv Banner'}
               className="w-full h-full object-cover object-top p-0 m-0"
               loading="eager"
             />

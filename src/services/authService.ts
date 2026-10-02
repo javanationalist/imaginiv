@@ -48,10 +48,10 @@ export const authService = {
     }
 
     // Fallback development authentication when Supabase credentials are pending in UI
-    if (email.trim() === 'admin@framedia.creative' && password === 'village2026') {
+    if ((email.trim() === 'admin@imaginiv.site' || email.trim() === 'admin@framedia.creative') && password === 'village2026') {
       const mockUser: VillageUser = {
         id: 'usr_village_admin_demo',
-        email: 'admin@framedia.creative',
+        email: 'admin@imaginiv.site',
         role: 'admin',
         name: 'Village Overseer',
       };

@@ -56,7 +56,7 @@ export const ArticleManager: React.FC = () => {
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
   const [inlineImages, setInlineImages] = useState<ArticleInlineImageData[]>([]);
-  const [author, setAuthor] = useState('Framedia Editorial');
+  const [author, setAuthor] = useState('Imaginiv Editorial');
   const [isPublished, setIsPublished] = useState(true);
 
   // Cover image states
@@ -136,7 +136,7 @@ export const ArticleManager: React.FC = () => {
     setExcerpt('');
     setContent('');
     setInlineImages([]);
-    setAuthor('Framedia Editorial');
+    setAuthor('Imaginiv Editorial');
     setIsPublished(true);
     setCoverFile(null);
     setCoverPreviewUrl(null);
@@ -159,7 +159,7 @@ export const ArticleManager: React.FC = () => {
     setContent(bodyText);
     setInlineImages(images);
 
-    setAuthor(art.author || 'Framedia Editorial');
+    setAuthor(art.author || 'Imaginiv Editorial');
     setIsPublished(art.is_published);
     setCoverFile(null);
     setCoverPreviewUrl(art.cover_image_url || null);
@@ -235,7 +235,7 @@ export const ArticleManager: React.FC = () => {
         content: finalContent,
         cover_image_url: finalCoverUrl,
         cover_image_path: finalCoverPath,
-        author: author.trim() || 'Framedia Editorial',
+        author: author.trim() || 'Imaginiv Editorial',
         is_published: publishState,
       });
 
@@ -259,7 +259,7 @@ export const ArticleManager: React.FC = () => {
         content: finalContent,
         cover_image_url: finalCoverUrl || undefined,
         cover_image_path: finalCoverPath || undefined,
-        author: author.trim() || 'Framedia Editorial',
+        author: author.trim() || 'Imaginiv Editorial',
         is_published: publishState,
       });
 
@@ -450,7 +450,7 @@ export const ArticleManager: React.FC = () => {
                       <div className="flex flex-wrap items-center gap-3 text-[11px] text-[#7C471E] font-medium mt-1.5">
                         <span className="flex items-center gap-1">
                           <User className="w-3 h-3 text-[#2F8FE0]" />
-                          <span>{art.author || 'Framedia Editorial'}</span>
+                          <span>{art.author || 'Imaginiv Editorial'}</span>
                         </span>
                         <span>&bull;</span>
                         <span className="flex items-center gap-1">
@@ -740,7 +740,7 @@ export const ArticleManager: React.FC = () => {
                     type="text"
                     value={author}
                     onChange={(e) => setAuthor(e.target.value)}
-                    placeholder="e.g. Framedia Editorial Atelier"
+                    placeholder="e.g. Imaginiv Editorial Atelier"
                     className="w-full px-3 py-2 text-xs rounded-xl border border-[#D6BC90] bg-[#FFFBF2] text-[#381E0A] focus:outline-none focus:border-[#2F8FE0]"
                   />
                 </div>

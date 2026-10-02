@@ -195,7 +195,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({
         <VillageAtelierIllustration />
         <div className="mt-4 max-w-sm">
           <div className="font-display text-base sm:text-lg text-[#381E0A]">
-            Framedia Creative Atelier
+            Imaginiv Atelier
           </div>
           <div className="text-xs font-bold text-[#7C471E] mt-0.5">
             Headquarters &bull; Collaborative Creative Village
@@ -210,8 +210,8 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({
 
   const currentBanner = activeBanners[currentIndex];
   const altText = currentBanner.caption?.trim() 
-    ? `${currentBanner.caption} - Framedia Creative`
-    : 'Framedia Creative banner showcase';
+    ? `${currentBanner.caption} - Imaginiv`
+    : 'Imaginiv banner showcase';
 
   // Slide animation variants
   const slideVariants = {
@@ -244,7 +244,7 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({
     <div
       role="region"
       aria-roledescription="carousel"
-      aria-label="Framedia Creative Banner Showcase"
+      aria-label="Imaginiv Banner Showcase"
       tabIndex={0}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => setIsHovered(true)}

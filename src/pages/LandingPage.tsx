@@ -71,7 +71,7 @@ export const LandingPage: React.FC = () => {
     },
     {
       id: 'infrateam',
-      name: 'inFra Team',
+      name: 'The Imaginers',
       route: '/infrateam',
       description: 'Our collaborative collective: directors, narrative architects, sound artists, and technologists.',
       iconName: 'team',
@@ -110,7 +110,7 @@ export const LandingPage: React.FC = () => {
     },
     {
       id: 'about',
-      name: 'About Framedia',
+      name: 'About Imaginiv',
       route: '/about',
       description: 'The story, vision, mission, and village tenets behind our multidisciplinary creative studio.',
       iconName: 'about',

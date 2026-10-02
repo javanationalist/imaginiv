@@ -8,7 +8,7 @@ import { CMSProject, CMSPortfolioItem, CMSTeamMember } from '../types';
 
 /**
  * CMS Service Architecture
- * Manages future CRUD operations between Framedia Creative UI and Supabase database tables.
+ * Manages future CRUD operations between Imaginiv UI and Supabase database tables.
  */
 export const cmsService = {
   // Projects collection

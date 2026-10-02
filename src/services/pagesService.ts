@@ -30,7 +30,7 @@ export const DEFAULT_PAGES_VISIBILITY: PageVisibilityRecord[] = [
   },
   {
     id: 'infra-team',
-    label: 'inFra Team',
+    label: 'The Imaginers',
     is_visible: true,
     route: '/infrateam',
     updated_at: new Date().toISOString(),
@@ -51,7 +51,7 @@ export const DEFAULT_PAGES_VISIBILITY: PageVisibilityRecord[] = [
   },
   {
     id: 'about',
-    label: 'About Framedia',
+    label: 'About Imaginiv',
     is_visible: true,
     route: '/about',
     updated_at: new Date().toISOString(),

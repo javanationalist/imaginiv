@@ -16,7 +16,7 @@ export interface InfraQueryOptions {
 }
 
 export const infraService = {
-  // Recommended Gemini Flash model configuration for Framedia Creative
+  // Recommended Gemini Flash model configuration for Imaginiv
   MODEL_NAME: 'gemini-2.5-flash',
 
   async queryAssistant(userPrompt: string, _options?: InfraQueryOptions): Promise<InfraMessage> {
@@ -44,7 +44,7 @@ export const infraService = {
     return {
       id: 'infra_' + Date.now(),
       sender: 'infra',
-      text: `Hello from inFra! I am the Framedia Creative village assistant architecture. Foundation ready for full generation.`,
+      text: `Hello from inFra! I am the Imaginiv village assistant architecture. Foundation ready for full generation.`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
   },

@@ -170,7 +170,7 @@ export const TenCreativePage: React.FC = () => {
 
   useEffect(() => {
     // Update Document Head SEO
-    document.title = "10 Creative Tenets – Nafa Nafisah & ALFAN | Framedia Creative";
+    document.title = "10 Creative Tenets – Nafa Nafisah & ALFAN | Imaginiv";
     
     let metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {

@@ -91,7 +91,7 @@ export const ForestBackdrop: React.FC<{ bgColor?: string }> = ({ bgColor = '#F6E
 
 /**
  * Original Cartoon Mascots:
- * "The Framedia Creative Villagers"
+ * "The Imaginiv Villagers"
  * Styled exactly like the cheerful characters peeking around the wooden pop-up panel
  * in village builder games (Smurfs' Village style).
  */
@@ -342,8 +342,8 @@ export const VillageAtelierIllustration: React.FC<{ className?: string }> = ({ c
 
         {/* Signboard hanging over door */}
         <rect x="94" y="96" width="32" height="13" rx="3" fill="#FFE08A" stroke="#573804" strokeWidth="2" />
-        <text x="110" y="105" textAnchor="middle" fill="#573804" fontSize="8" fontWeight="bold" fontFamily="sans-serif">
-          FRAMEDIA
+        <text x="110" y="105" textAnchor="middle" fill="#573804" fontSize="7.5" fontWeight="bold" fontFamily="sans-serif">
+          IMAGINIV
         </text>
       </svg>
     </div>

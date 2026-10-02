@@ -23,7 +23,7 @@ export const AboutPage: React.FC = () => {
     <PageShell>
       {/* 1. Page Title */}
       <PageTitle
-        title="About Framedia"
+        title="About Imaginiv"
         subtitle="The story, vision, mission, and collaborative village philosophy behind our multidisciplinary creative studio."
         icon={<Compass className="w-8 h-8 text-[#A05C25]" strokeWidth={2.3} />}
         categoryTag="Village Hall & Atelier"

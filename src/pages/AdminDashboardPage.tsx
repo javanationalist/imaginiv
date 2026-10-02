@@ -130,7 +130,7 @@ export const AdminDashboardPage: React.FC = () => {
     { id: 'projects' as CMSTab, label: 'Project', icon: Clapperboard },
     { id: 'portfolio' as CMSTab, label: 'Portfolio', icon: Images },
     { id: 'being_creative' as CMSTab, label: 'Being Creative', icon: Lightbulb },
-    { id: 'team' as CMSTab, label: 'inFra Team', icon: Users },
+    { id: 'team' as CMSTab, label: 'The Imaginers', icon: Users },
     { id: 'ethics' as CMSTab, label: 'AI Ethics', icon: Scale },
     { id: 'inclusivity' as CMSTab, label: 'Inclusivity', icon: HeartHandshake },
   ];
@@ -142,7 +142,7 @@ export const AdminDashboardPage: React.FC = () => {
       case 'articles': return 'Articles & Editorial Archive';
       case 'projects': return 'Project Management';
       case 'portfolio': return 'Portfolio Management';
-      case 'team': return 'inFra Team Management';
+      case 'team': return 'The Imaginers Management';
       case 'being_creative': return 'Being Creative Tenets';
       case 'ethics': return 'AI Ethics Charter Management';
       case 'inclusivity': return 'Inclusivity Framework';
@@ -183,7 +183,7 @@ export const AdminDashboardPage: React.FC = () => {
                 Village CMS Portal
               </div>
               <div className="text-[11px] text-[#FFE8C2] font-semibold mt-0.5 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
-                Administrator: {currentUser?.email || 'admin@framedia.creative'}
+                Administrator: {currentUser?.email || 'admin@imaginiv.site'}
               </div>
             </div>
           </div>
@@ -454,7 +454,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
 
                 <div className="pt-4 border-t-2 border-[#D6BC90] flex flex-col sm:flex-row items-center justify-between text-xs font-bold text-[#7C471E] gap-2">
-                  <span>Framedia Creative Atelier CMS &bull; Page Visibility Engine</span>
+                  <span>Imaginiv Atelier CMS &bull; Page Visibility Engine</span>
                   <div className="flex items-center gap-3">
                     <span className="text-[#381E0A]">Active: {activePagesCount} / {pages.length}</span>
                     <span className="text-[#A8642E]">&bull;</span>

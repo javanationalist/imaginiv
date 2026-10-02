@@ -605,7 +605,7 @@ export const BannerManager: React.FC = () => {
           <div className="relative w-full rounded-2xl overflow-hidden border-3 border-[#542E10] shadow-[0_6px_0_#2B1302] bg-[#76C7F5] p-3 space-y-3">
             {/* Mock Header */}
             <div className="flex items-center justify-between px-3 py-1.5 game-wood-plank rounded-lg shadow-sm text-[11px] font-bold text-[#FFE8C2]">
-              <span>Framedia Creative Atelier</span>
+              <span>Imaginiv Atelier</span>
               <span className="text-[10px] text-white/80">Directory &bull; Article</span>
             </div>
 
@@ -628,7 +628,7 @@ export const BannerManager: React.FC = () => {
             <div className="game-wood-frame p-2 rounded-xl text-center">
               <div className="game-parchment p-2 rounded-lg text-center">
                 <span className="font-display text-xs text-[#381E0A]">
-                  FRAMEDIA CREATIVE &bull; Narrative Craft &amp; Tactile Visual Production
+                  IMAGINIV &bull; Narrative Craft &amp; Tactile Visual Production
                 </span>
               </div>
             </div>

@@ -308,19 +308,19 @@ export const BEING_CREATIVE_TENETS: CreativeTenet[] = [
   }
 ];
 
-// 4. inFra Team Data
+// 4. The Imaginers Data
 export const INFRA_TEAM_MEMBERS: TeamMember[] = [
   {
     id: 'elena-vance',
     name: 'Elena Vance',
     role: 'Creative Director & Narrative Lead',
     discipline: 'Cinematic Storytelling & Editorial Vision',
-    bio: 'Former documentary cinematographer with 14 years of experience directing non-fiction cinema across 18 countries. Guides the narrative soul of all Framedia studio commissions.',
+    bio: 'Former documentary cinematographer with 14 years of experience directing non-fiction cinema across 18 countries. Guides the narrative soul of all Imaginiv studio commissions.',
     avatarSeed: 'Elena',
     socials: {
-      portfolio: 'https://framedia.creative',
+      portfolio: 'https://imaginiv.site',
       linkedin: 'https://linkedin.com',
-      mail: 'elena@framedia.creative'
+      mail: 'elena@imaginiv.site'
     },
     colorScheme: 'orange'
   },
@@ -332,9 +332,9 @@ export const INFRA_TEAM_MEMBERS: TeamMember[] = [
     bio: 'Trained in classical bookbinding and modern computational typography. Champions physical letterpress, sustainable packaging materials, and balanced bento layouts.',
     avatarSeed: 'Marcus',
     socials: {
-      portfolio: 'https://framedia.creative',
+      portfolio: 'https://imaginiv.site',
       github: 'https://github.com',
-      mail: 'marcus@framedia.creative'
+      mail: 'marcus@imaginiv.site'
     },
     colorScheme: 'green'
   },
@@ -346,9 +346,9 @@ export const INFRA_TEAM_MEMBERS: TeamMember[] = [
     bio: 'Acoustic ecologist capturing organic environmental vibrations. Builds custom hydrophones and binaural microphone arrays for studio documentaries and installations.',
     avatarSeed: 'Soraya',
     socials: {
-      portfolio: 'https://framedia.creative',
+      portfolio: 'https://imaginiv.site',
       linkedin: 'https://linkedin.com',
-      mail: 'soraya@framedia.creative'
+      mail: 'soraya@imaginiv.site'
     },
     colorScheme: 'blue'
   },
@@ -360,9 +360,9 @@ export const INFRA_TEAM_MEMBERS: TeamMember[] = [
     bio: 'Passionate about WCAG AAA contrast, semantic HTML, and lightweight performant web experiences that welcome users on low-bandwidth devices.',
     avatarSeed: 'David',
     socials: {
-      portfolio: 'https://framedia.creative',
+      portfolio: 'https://imaginiv.site',
       github: 'https://github.com',
-      mail: 'david@framedia.creative'
+      mail: 'david@imaginiv.site'
     },
     colorScheme: 'orange'
   },
@@ -374,9 +374,9 @@ export const INFRA_TEAM_MEMBERS: TeamMember[] = [
     bio: 'Researcher dedicated to protecting human artists from exploitative training datasets and enforcing transparent AI disclosure in commercial workflows.',
     avatarSeed: 'Amara',
     socials: {
-      portfolio: 'https://framedia.creative',
+      portfolio: 'https://imaginiv.site',
       linkedin: 'https://linkedin.com',
-      mail: 'amara@framedia.creative'
+      mail: 'amara@imaginiv.site'
     },
     colorScheme: 'green'
   },
@@ -388,9 +388,9 @@ export const INFRA_TEAM_MEMBERS: TeamMember[] = [
     bio: 'Architect focused on circular timber construction and museum pavilions that merge physical tactile craft with responsive environmental acoustics.',
     avatarSeed: 'Julian',
     socials: {
-      portfolio: 'https://framedia.creative',
+      portfolio: 'https://imaginiv.site',
       linkedin: 'https://linkedin.com',
-      mail: 'julian@framedia.creative'
+      mail: 'julian@imaginiv.site'
     },
     colorScheme: 'blue'
   }

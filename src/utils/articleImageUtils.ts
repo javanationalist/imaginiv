@@ -192,8 +192,8 @@ export function parseArticleContent(rawContent: string): {
   let body = rawContent;
   let images: ArticleInlineImageData[] = [];
 
-  // 1. Extract from framedia:images HTML comment block if present
-  const commentMatch = body.match(/<!--\s*framedia:images\s*([\s\S]*?)\s*-->/i);
+  // 1. Extract from imaginiv:images (or legacy framedia:images) HTML comment block if present
+  const commentMatch = body.match(/<!--\s*(?:imaginiv|framedia):images\s*([\s\S]*?)\s*-->/i);
   if (commentMatch) {
     try {
       const parsed = JSON.parse(commentMatch[1]);
@@ -219,7 +219,7 @@ export function parseArticleContent(rawContent: string): {
       console.warn('Failed to parse inline images JSON from comment:', e);
     }
     // Remove comment block completely from body
-    body = body.replace(/<!--\s*framedia:images\s*[\s\S]*?\s*-->/gi, '').trimEnd();
+    body = body.replace(/<!--\s*(?:imaginiv|framedia):images\s*[\s\S]*?\s*-->/gi, '').trimEnd();
   }
 
   // 2. Migration: Detect and convert incorrect markdown links [Gambar 01](https://...) or [image01](https://...)
@@ -308,7 +308,7 @@ export function serializeArticleContent(
 
   // Strip any old comment block
   const cleanBody = bodyText
-    .replace(/\n*<!--\s*framedia:images[\s\S]*?-->/gi, '')
+    .replace(/\n*<!--\s*(?:imaginiv|framedia):images[\s\S]*?-->/gi, '')
     .trimEnd();
 
   if (!cleanBody) return '';
@@ -337,5 +337,5 @@ export function serializeArticleContent(
     return cleanBody;
   }
 
-  return `${cleanBody}\n\n<!-- framedia:images\n${JSON.stringify(activeImages, null, 2)}\n-->`;
+  return `${cleanBody}\n\n<!-- imaginiv:images\n${JSON.stringify(activeImages, null, 2)}\n-->`;
 }

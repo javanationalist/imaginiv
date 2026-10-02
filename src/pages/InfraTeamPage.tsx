@@ -23,7 +23,7 @@ export const InfraTeamPage: React.FC = () => {
     <PageShell>
       {/* 1. Page Title */}
       <PageTitle
-        title="inFra Team"
+        title="The Imaginers"
         subtitle="Meet the multidisciplinary collective of directors, narrative architects, sound ecologists, and creative technologists."
         icon={<Users className="w-8 h-8 text-[#52C01B]" strokeWidth={2.3} />}
         categoryTag="Artisan Guild"

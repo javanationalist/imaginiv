@@ -86,7 +86,7 @@ export default function App() {
             <Route
               path="/infrateam"
               element={
-                <PageVisibilityGuard pageId="infra-team" pageLabel="inFra Team">
+                <PageVisibilityGuard pageId="infra-team" pageLabel="The Imaginers">
                   <InfraTeamPage />
                 </PageVisibilityGuard>
               }
@@ -110,7 +110,7 @@ export default function App() {
             <Route
               path="/about"
               element={
-                <PageVisibilityGuard pageId="about" pageLabel="About Framedia">
+                <PageVisibilityGuard pageId="about" pageLabel="About Imaginiv">
                   <AboutPage />
                 </PageVisibilityGuard>
               }
