@@ -147,14 +147,18 @@ export const InfraTeamPage: React.FC = () => {
           </div>
         ) : (
           /* Members Grid - Strictly Maximum 2 Columns, Centered, 3:4 Aspect Ratio Photos */
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto justify-items-center">
-            {members.map((member) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto justify-items-center w-full">
+            {members.map((member, index) => {
               const photoUrl = member.photo_url || member.picture_url || '';
+              const isLastOdd = members.length % 2 !== 0 && index === members.length - 1;
 
               return (
                 <div
                   key={member.id}
-                  className="game-wood-frame p-3.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl w-full max-w-sm"
+                  style={{ animationDelay: `${index * 0.12}s` }}
+                  className={`cartoon-bounce-in game-wood-frame p-3.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl w-full max-w-sm ${
+                    isLastOdd ? 'md:col-span-2 justify-self-center mx-auto' : ''
+                  }`}
                 >
                   {/* Photo with exact 3:4 portrait ratio without distortion */}
                   <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden border-2 border-[#542E10] bg-[#1F1004] shadow-inner mb-3.5">
@@ -183,16 +187,11 @@ export const InfraTeamPage: React.FC = () => {
                       </h2>
                     )}
 
-                    {/* 2. Nomor Induk Mahasiswa (Label & Value directly below) */}
+                    {/* 2. NIM Value directly below name (without label) */}
                     {member.nim && (
-                      <div className="flex flex-col items-center text-center">
-                        <span className="text-[11px] font-bold text-[#8C5D35] uppercase tracking-wider">
-                          Nomor Induk Mahasiswa
-                        </span>
-                        <span className="font-mono text-xs sm:text-sm font-extrabold text-[#381E0A] tracking-wider mt-0.5">
-                          {member.nim}
-                        </span>
-                      </div>
+                      <p className="font-mono text-xs sm:text-sm font-extrabold text-[#8C5D35] tracking-wider -mt-1">
+                        {member.nim}
+                      </p>
                     )}
 
                     {/* 3. Role Beneath NIM */}

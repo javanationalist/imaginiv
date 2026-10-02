@@ -765,18 +765,18 @@ export const TheImaginersManager: React.FC = () => {
             />
           </div>
 
-          {/* FIELD 3: NIM (NOMOR INDUK MAHASISWA) */}
+          {/* FIELD 3: NIM */}
           <div>
             <label className="block text-xs sm:text-sm font-bold text-[#381E0A] mb-1.5">
-              NIM * <span className="text-xs font-semibold text-[#7C471E]">(Nomor Induk Mahasiswa, wajib)</span>
+              NIM * <span className="text-xs font-semibold text-[#7C471E]">(Wajib, angka)</span>
             </label>
             <input
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
               value={nim}
-              onChange={(e) => setNim(e.target.value)}
-              placeholder="Masukkan Nomor Induk Mahasiswa (contoh: 21010122130001)"
+              onChange={(e) => setNim(e.target.value.replace(/[^0-9]/g, ''))}
+              placeholder="Masukkan NIM (contoh: 21010122130001)"
               required
               className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF0D4] border-2 border-[#D6BC90] focus:border-[#2F8FE0] focus:outline-hidden text-sm text-[#381E0A] font-semibold transition-all shadow-inner"
             />
