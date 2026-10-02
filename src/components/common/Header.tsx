@@ -63,7 +63,7 @@ export const Header: React.FC = () => {
     { id: 'project', name: 'Project', route: '/project', icon: Clapperboard, subtitle: 'Active Film Pipeline' },
     { id: 'portfolio', name: 'Portfolio', route: '/portfolio', icon: Images, subtitle: 'Curated Works Gallery' },
     { id: 'being-creative', name: 'Being Creative', route: '/beingcreative', icon: Lightbulb, subtitle: '10 Studio Tenets' },
-    { id: 'infra-team', name: 'The Imaginers', route: '/infrateam', icon: Users, subtitle: 'Artisan Collective' },
+    { id: 'infra-team', name: 'The Imaginers', route: '/theimaginers', icon: Users, subtitle: 'Artisan Collective' },
     { id: 'ai-ethics', name: 'AI Ethics', route: '/aiethics', icon: Scale, subtitle: 'Human Authorship Charter' },
     { id: 'inclusivity', name: 'Inclusivity', route: '/inclusivity', icon: HeartHandshake, subtitle: 'Universal Access' },
     { id: 'about', name: 'About', route: '/about', icon: Compass, subtitle: 'Origins & Philosophy' },

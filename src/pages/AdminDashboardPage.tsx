@@ -36,6 +36,7 @@ import { Modal } from '../components/common/Modal';
 import { ForestBackdrop } from '../components/common/VillageArtwork';
 import { BannerManager } from '../components/admin/BannerManager';
 import { ArticleManager } from '../components/admin/ArticleManager';
+import { TheImaginersManager } from '../components/admin/TheImaginersManager';
 
 type CMSTab = 'visibility' | 'banners' | 'articles' | 'projects' | 'portfolio' | 'team' | 'being_creative' | 'ethics' | 'inclusivity';
 
@@ -130,7 +131,7 @@ export const AdminDashboardPage: React.FC = () => {
     { id: 'projects' as CMSTab, label: 'Project', icon: Clapperboard },
     { id: 'portfolio' as CMSTab, label: 'Portfolio', icon: Images },
     { id: 'being_creative' as CMSTab, label: 'Being Creative', icon: Lightbulb },
-    { id: 'team' as CMSTab, label: 'The Imaginers', icon: Users },
+    { id: 'team' as CMSTab, label: 'The Imaginers', icon: Users, isPrimary: true },
     { id: 'ethics' as CMSTab, label: 'AI Ethics', icon: Scale },
     { id: 'inclusivity' as CMSTab, label: 'Inclusivity', icon: HeartHandshake },
   ];
@@ -291,7 +292,7 @@ export const AdminDashboardPage: React.FC = () => {
                       </h2>
                     </div>
 
-                    {activeTab !== 'visibility' && activeTab !== 'banners' && activeTab !== 'articles' && (
+                    {activeTab !== 'visibility' && activeTab !== 'banners' && activeTab !== 'articles' && activeTab !== 'team' && (
                       <button
                         type="button"
                         onClick={() => setIsCreateModalOpen(true)}
@@ -429,8 +430,15 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
                   )}
 
+                  {/* TAB 4: THE IMAGINERS MANAGEMENT */}
+                  {activeTab === 'team' && (
+                    <div className="my-6">
+                      <TheImaginersManager />
+                    </div>
+                  )}
+
                   {/* OTHER TABS: GENERAL CMS STANDBY */}
-                  {activeTab !== 'visibility' && activeTab !== 'banners' && activeTab !== 'articles' && (
+                  {activeTab !== 'visibility' && activeTab !== 'banners' && activeTab !== 'articles' && activeTab !== 'team' && (
                     <div className="my-8 p-6 sm:p-10 rounded-xl bg-[#FAF2DF] border-2 border-[#D6BC90] text-center">
                       <div className="w-14 h-14 mx-auto rounded-xl bg-gradient-to-b from-[#FFF8EC] to-[#EADBBD] border border-[#5D2B03] flex items-center justify-center text-[#8B5226] mb-3 shadow-xs">
                         <Database className="w-7 h-7" />

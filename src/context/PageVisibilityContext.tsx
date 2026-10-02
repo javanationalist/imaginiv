@@ -54,7 +54,7 @@ export const PageVisibilityProvider: React.FC<{ children: React.ReactNode }> = (
     let targetId = clean;
     if (clean === 'beingcreative' || clean === '10beingcreative' || clean === 'being-creative') {
       targetId = 'being-creative';
-    } else if (clean === 'infrateam' || clean === 'infra-team') {
+    } else if (clean === 'theimaginers' || clean === 'the-imaginers' || clean === 'infrateam' || clean === 'infra-team' || clean === 'infra') {
       targetId = 'infra-team';
     } else if (clean === 'aiethics' || clean === 'ai-ethics') {
       targetId = 'ai-ethics';

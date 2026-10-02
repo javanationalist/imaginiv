@@ -72,7 +72,7 @@ export const LandingPage: React.FC = () => {
     {
       id: 'infrateam',
       name: 'The Imaginers',
-      route: '/infrateam',
+      route: '/theimaginers',
       description: 'Our collaborative collective: directors, narrative architects, sound artists, and technologists.',
       iconName: 'team',
       colorScheme: 'green',

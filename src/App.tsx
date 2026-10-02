@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ScrollToTop } from './components/common/ScrollToTop';
 import { BackToTopButton } from './components/common/BackToTopButton';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -84,13 +84,16 @@ export default function App() {
               }
             />
             <Route
-              path="/infrateam"
+              path="/theimaginers"
               element={
                 <PageVisibilityGuard pageId="infra-team" pageLabel="The Imaginers">
                   <InfraTeamPage />
                 </PageVisibilityGuard>
               }
             />
+            {/* Backward compatibility redirects */}
+            <Route path="/infrateam" element={<Navigate to="/theimaginers" replace />} />
+            <Route path="/infra" element={<Navigate to="/theimaginers" replace />} />
             <Route
               path="/aiethics"
               element={

@@ -90,3 +90,41 @@ export interface ArticleItem {
   updated_at?: string;
 }
 
+export type SocialPlatform =
+  | 'Email'
+  | 'LinkedIn'
+  | 'Instagram'
+  | 'YouTube'
+  | 'TikTok'
+  | 'Website'
+  | 'Pinterest'
+  | 'X'
+  | 'Threads'
+  | 'Lainnya';
+
+export interface MemberSocialLink {
+  platform: SocialPlatform;
+  value_or_url: string;
+}
+
+export interface ImaginersPageData {
+  title: string;
+  description: string;
+  updated_at?: string;
+}
+
+export interface ImaginersMember {
+  id: string;
+  name: string;
+  photo_url: string;
+  picture_url?: string;
+  photo_path?: string | null;
+  picture_path?: string | null;
+  role: string;
+  social_media: MemberSocialLink[];
+  display_order: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+

@@ -153,23 +153,21 @@ export const ArticleListPage: React.FC = () => {
                         <span className="text-xs font-bold">Imaginiv Publication</span>
                       </div>
                     )}
-
-                    {/* Gradient Overlay for card badge contrast */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-
-                    {/* Publication Date Badge */}
-                    <div className="absolute bottom-2.5 left-3 flex items-center gap-1.5 text-[11px] font-bold text-white bg-black/60 backdrop-blur-xs px-2.5 py-0.5 rounded-full border border-white/20">
-                      <Calendar className="w-3 h-3 text-[#FFD452]" />
-                      <span>{formatDate(article.published_at || article.created_at)}</span>
-                    </div>
                   </div>
 
                   {/* Body Content */}
                   <div className="p-5">
-                    {/* Author tag */}
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#8C5226] mb-2">
-                      <User className="w-3.5 h-3.5 text-[#2F8FE0]" />
-                      <span className="truncate">{article.author || 'Imaginiv'}</span>
+                    {/* Author & Publication Date Bar */}
+                    <div className="flex items-center justify-between gap-2 text-xs mb-2.5">
+                      <div className="flex items-center gap-1.5 font-bold text-[#8C5226] min-w-0">
+                        <User className="w-3.5 h-3.5 text-[#2F8FE0] shrink-0" />
+                        <span className="truncate">{article.author || 'Imaginiv'}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#7C471E] shrink-0">
+                        <Calendar className="w-3.5 h-3.5 text-[#A05C25]" />
+                        <span>{formatDate(article.published_at || article.created_at)}</span>
+                      </div>
                     </div>
 
                     {/* Title */}

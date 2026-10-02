@@ -11,9 +11,16 @@ import { ForestBackdrop } from './VillageArtwork';
 export interface PageShellProps {
   children: React.ReactNode;
   className?: string;
+  parchmentClassName?: string;
+  parchmentStyle?: React.CSSProperties;
 }
 
-export const PageShell: React.FC<PageShellProps> = ({ children, className = '' }) => {
+export const PageShell: React.FC<PageShellProps> = ({ 
+  children, 
+  className = '',
+  parchmentClassName = '',
+  parchmentStyle,
+}) => {
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden pt-14 sm:pt-16">
       {/* 1. Living Cartoon Forest Environment */}
@@ -30,7 +37,10 @@ export const PageShell: React.FC<PageShellProps> = ({ children, className = '' }
           <div className="absolute top-3 right-3 game-nail !w-3.5 !h-3.5" />
 
           {/* Parchment Paper Container holding the page content */}
-          <div className="game-parchment p-5 sm:p-8 lg:p-10 rounded-2xl relative">
+          <div 
+            className={`game-parchment p-5 sm:p-8 lg:p-10 rounded-2xl relative ${parchmentClassName}`}
+            style={parchmentStyle}
+          >
             {children}
           </div>
         </div>
