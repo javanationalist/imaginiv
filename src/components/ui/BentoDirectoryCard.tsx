@@ -25,11 +25,21 @@ export interface BentoCardData extends DirectoryItem {
   villageRole?: string; // e.g. "Cinema Atelier", "Gallery Pavilion", etc.
 }
 
-interface BentoDirectoryCardProps {
+export interface BentoDirectoryCardProps {
   item: BentoCardData;
+  animationState?: 'hidden' | 'animating' | 'done';
+  animationDelay?: number;
+  onAnimationEnd?: () => void;
+  innerRef?: (node: HTMLElement | null) => void;
 }
 
-export const BentoDirectoryCard: React.FC<BentoDirectoryCardProps> = ({ item }) => {
+export const BentoDirectoryCard: React.FC<BentoDirectoryCardProps> = ({ 
+  item,
+  animationState,
+  animationDelay = 0,
+  onAnimationEnd,
+  innerRef,
+}) => {
   const getIcon = (iconName: string) => {
     const iconClass = "w-8 h-8 text-white transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_2px_0_rgba(0,0,0,0.3)]";
     switch (iconName) {
@@ -64,10 +74,20 @@ export const BentoDirectoryCard: React.FC<BentoDirectoryCardProps> = ({ item }) 
   return (
     <Link
       id={`bento-card-${item.id}`}
+      data-directory-id={item.id}
+      ref={innerRef}
       to={item.route}
+      onAnimationEnd={onAnimationEnd}
+      style={
+        animationState === 'animating' && animationDelay > 0
+          ? { animationDelay: `${animationDelay}s` }
+          : undefined
+      }
       className={`
         game-parchment group flex flex-col items-center justify-center p-6 text-center select-none cursor-pointer transition-all duration-200 hover:-translate-y-1.5 hover:shadow-[0_12px_24px_rgba(40,18,4,0.3)] min-h-[140px]
         ${item.isFeatured ? 'md:col-span-2' : 'col-span-1'}
+        ${animationState === 'hidden' ? 'directory-btn-hidden' : ''}
+        ${animationState === 'animating' ? 'directory-btn-animate' : ''}
       `}
     >
       {/* Corner Nails on Parchment */}

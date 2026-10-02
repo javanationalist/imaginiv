@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowDown, 
   Search, 
@@ -20,6 +20,13 @@ import { usePageVisibility } from '../context/PageVisibilityContext';
 export const LandingPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { isPageVisible, loading } = usePageVisibility();
+
+  // Animation states: 'hidden' -> 'animating' -> 'done'
+  const [animatedItems, setAnimatedItems] = useState<
+    Record<string, { state: 'hidden' | 'animating' | 'done'; delay: number }>
+  >({});
+  const directorySectionRef = useRef<HTMLElement | null>(null);
+  const cardElementsRef = useRef<Map<string, HTMLElement>>(new Map());
 
   const scrollToDirectory = () => {
     const el = document.getElementById('directory');
@@ -152,6 +159,135 @@ export const LandingPage: React.FC = () => {
     );
   });
 
+  const isReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isSearching = searchQuery.trim().length > 0;
+
+  useEffect(() => {
+    // If reduced motion is requested or user is actively searching, immediately mark items as 'done'
+    if (isReducedMotion || isSearching) {
+      setAnimatedItems((prev) => {
+        const next = { ...prev };
+        filteredItems.forEach((item) => {
+          next[item.id] = { state: 'done', delay: 0 };
+        });
+        return next;
+      });
+      return;
+    }
+
+    if (typeof IntersectionObserver === 'undefined') {
+      setAnimatedItems((prev) => {
+        const next = { ...prev };
+        filteredItems.forEach((item) => {
+          next[item.id] = { state: 'done', delay: 0 };
+        });
+        return next;
+      });
+      return;
+    }
+
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+
+    if (isDesktop) {
+      // DESKTOP BEHAVIOR:
+      // Trigger when approx 20% of the Directory section becomes visible
+      // Animate Directory buttons sequentially one by one in visual order with 0.12s stagger delay
+      const sectionEl = directorySectionRef.current || document.getElementById('directory');
+      if (!sectionEl) return;
+
+      const sectionObserver = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          if (entry && entry.isIntersecting && entry.intersectionRatio >= 0.18) {
+            setAnimatedItems((prev) => {
+              const next = { ...prev };
+              let staggerIndex = 0;
+              filteredItems.forEach((item) => {
+                if (!prev[item.id] || prev[item.id].state === 'hidden') {
+                  next[item.id] = {
+                    state: 'animating',
+                    delay: Number((staggerIndex * 0.12).toFixed(2)),
+                  };
+                  staggerIndex++;
+                }
+              });
+              return next;
+            });
+            sectionObserver.disconnect();
+          }
+        },
+        { threshold: 0.2 }
+      );
+
+      sectionObserver.observe(sectionEl);
+
+      return () => {
+        sectionObserver.disconnect();
+      };
+    } else {
+      // MOBILE BEHAVIOR:
+      // Animate Directory buttons individually based on when each button enters the viewport (threshold 0.2)
+      // If multiple buttons become visible at approximately the same time, animate sequentially with 0.12s stagger delay
+      // Buttons further down wait until they actually enter the viewport
+      const cardObserver = new IntersectionObserver(
+        (entries) => {
+          const newlyIntersecting: string[] = [];
+
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.18) {
+              const id = entry.target.getAttribute('data-directory-id');
+              if (id) {
+                newlyIntersecting.push(id);
+                cardObserver.unobserve(entry.target);
+              }
+            }
+          });
+
+          if (newlyIntersecting.length > 0) {
+            const orderedBatch = filteredItems
+              .map((it) => it.id)
+              .filter((id) => newlyIntersecting.includes(id));
+
+            setAnimatedItems((prev) => {
+              const next = { ...prev };
+              let batchIndex = 0;
+              orderedBatch.forEach((id) => {
+                if (!prev[id] || prev[id].state === 'hidden') {
+                  next[id] = {
+                    state: 'animating',
+                    delay: Number((batchIndex * 0.12).toFixed(2)),
+                  };
+                  batchIndex++;
+                }
+              });
+              return next;
+            });
+          }
+        },
+        { threshold: 0.2 }
+      );
+
+      // Register cards in observer
+      cardElementsRef.current.forEach((el) => {
+        cardObserver.observe(el);
+      });
+
+      return () => {
+        cardObserver.disconnect();
+      };
+    }
+  }, [filteredItems, isSearching, isReducedMotion]);
+
+  const handleAnimationEnd = (itemId: string) => {
+    setAnimatedItems((prev) => {
+      if (prev[itemId]?.state === 'done') return prev;
+      return {
+        ...prev,
+        [itemId]: { state: 'done', delay: 0 },
+      };
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden bg-[#F6EAD2] pt-14 sm:pt-16" style={{ backgroundColor: '#F6EAD2' }}>
       {/* Cartoon Forest Living Environment Backdrop */}
@@ -185,7 +321,7 @@ export const LandingPage: React.FC = () => {
             - Real-time search bar
             - 7 Destination Cards
         */}
-        <section id="directory" className="pt-6 pb-20 scroll-mt-20">
+        <section id="directory" ref={directorySectionRef} className="pt-6 pb-20 scroll-mt-20">
           <div className="game-wood-frame p-4 sm:p-7 relative">
             {/* Corner Nails on Board */}
             <div className="absolute top-3 left-3 game-nail !w-3.5 !h-3.5" />
@@ -262,9 +398,28 @@ export const LandingPage: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                {filteredItems.map((item) => (
-                  <BentoDirectoryCard key={item.id} item={item} />
-                ))}
+                {filteredItems.map((item) => {
+                  const anim = isSearching || isReducedMotion
+                    ? { state: 'done' as const, delay: 0 }
+                    : (animatedItems[item.id] || { state: 'hidden' as const, delay: 0 });
+
+                  return (
+                    <BentoDirectoryCard
+                      key={item.id}
+                      item={item}
+                      animationState={anim.state}
+                      animationDelay={anim.delay}
+                      onAnimationEnd={() => handleAnimationEnd(item.id)}
+                      innerRef={(el) => {
+                        if (el) {
+                          cardElementsRef.current.set(item.id, el);
+                        } else {
+                          cardElementsRef.current.delete(item.id);
+                        }
+                      }}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>
