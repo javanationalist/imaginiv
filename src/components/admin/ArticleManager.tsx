@@ -676,6 +676,7 @@ export const ArticleManager: React.FC = () => {
                     onChange={setContent}
                     inlineImages={inlineImages}
                     onImagesChange={setInlineImages}
+                    articleTitle={title}
                   />
                 </div>
                 <div className={editorTab === 'preview' ? 'block' : 'hidden'}>

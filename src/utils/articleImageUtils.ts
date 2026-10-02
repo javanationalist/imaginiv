@@ -8,6 +8,7 @@ export interface ArticleInlineImageData {
   placeholder: string; // e.g. "[Gambar 01]", "[Gambar 02]"
   image_url: string; // e.g. "https://example.com/image.png"
   image_title?: string; // e.g. "Proses produksi karya kreatif"
+  storage_path?: string; // e.g. "Steal Like an Artist/Gambar 01.png"
   url?: string; // backwards compatibility alias
   title?: string; // backwards compatibility alias
 }
@@ -57,6 +58,80 @@ export function placeholderToId(placeholderOrId: string): string {
 }
 
 /**
+ * Sanitizes a path segment (article name or image inline title) so it is
+ * safe for Supabase Storage while preserving natural, readable names and spaces.
+ * Example: "Steal Like an Artist" -> "Steal Like an Artist"
+ * Removes illegal characters: / \ : * ? " < > | and control characters.
+ */
+export function sanitizeStorageSegment(segment: string, fallback: string = 'Untitled'): string {
+  if (!segment || typeof segment !== 'string') return fallback;
+
+  let clean = segment
+    // Replace illegal path characters with dash
+    .replace(/[\/\\:\*\?"<>\|]/g, '-')
+    // Strip control characters
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    // Collapse consecutive whitespace
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Strip leading and trailing periods or dashes that can corrupt folder names
+  clean = clean.replace(/^[\.\-]+|[\.\-]+$/g, '').trim();
+
+  return clean || fallback;
+}
+
+/**
+ * Automatically builds the Supabase Storage filename and path following the exact specification:
+ * [Article Name]/[Image Inline Title].[Original Image Extension]
+ *
+ * Example:
+ * article_name: "Steal Like an Artist"
+ * image_inline_title: "Gambar 01"
+ * original_extension: "png"
+ * result_filename: "Steal Like an Artist/Gambar 01.png"
+ *
+ * Requirements enforced:
+ * - Uses the actual article title as the first part.
+ * - Uses the inline image title entered by the admin as the second part.
+ * - Preserves the original image file extension (e.g. .jpg, .jpeg, .png, .webp).
+ * - Sanitizes Article Name and Image Inline Title for storage safety.
+ * - Does NOT use the user's original uploaded filename.
+ * - Applies a safe unique suffix (e.g. " (2)") only if an image with the same path already exists.
+ */
+export function buildInlineImageStoragePath(
+  articleName: string,
+  imageInlineTitle: string,
+  originalExtension: string,
+  existingStoragePaths: (string | undefined | null)[] = []
+): string {
+  const cleanArticle = sanitizeStorageSegment(articleName, 'Article');
+  const cleanTitle = sanitizeStorageSegment(imageInlineTitle, 'Gambar 01');
+  const cleanExt = (originalExtension || 'png').replace(/^\./, '').toLowerCase().trim() || 'png';
+
+  const basePath = `${cleanArticle}/${cleanTitle}.${cleanExt}`;
+
+  // Filter existing paths to non-empty lowercased set
+  const existingSet = new Set(
+    existingStoragePaths
+      .filter((p): p is string => Boolean(p && typeof p === 'string'))
+      .map((p) => p.toLowerCase().trim())
+  );
+
+  if (!existingSet.has(basePath.toLowerCase())) {
+    return basePath;
+  }
+
+  // If path already exists, append safe unique suffix: [Article Name]/[Image Inline Title] (2).[Original Image Extension]
+  let counter = 2;
+  while (existingSet.has(`${cleanArticle}/${cleanTitle} (${counter}).${cleanExt}`.toLowerCase())) {
+    counter++;
+  }
+
+  return `${cleanArticle}/${cleanTitle} (${counter}).${cleanExt}`;
+}
+
+/**
  * Calculates the next sequential placeholder: [Gambar 01], [Gambar 02], etc.
  * Always uses two digits (01, 02, ...).
  */
@@ -98,7 +173,7 @@ export function getNextPlaceholder(
 /**
  * Parses article content, extracting:
  * 1. Clean bodyText (containing [Gambar 01], [Gambar 02], etc. directly in text flow)
- * 2. Associated images metadata array [{ id, placeholder, image_url, image_title }, ...]
+ * 2. Associated images metadata array [{ id, placeholder, image_url, image_title, storage_path }, ...]
  *
  * Supports robust migration of previous formats:
  * - Incorrect markdown link: [Gambar 01](https://...) -> cleanly converted to [Gambar 01] in-place
@@ -128,11 +203,13 @@ export function parseArticleContent(rawContent: string): {
           const placeholder = normalizePlaceholder(item.placeholder || id);
           const image_url = String(item.image_url || item.url || '');
           const image_title = item.image_title !== undefined ? String(item.image_title) : (item.title ? String(item.title) : '');
+          const storage_path = item.storage_path ? String(item.storage_path) : undefined;
           return {
             id,
             placeholder,
             image_url,
             image_title,
+            storage_path,
             url: image_url,
             title: image_title,
           };
@@ -219,7 +296,7 @@ export function parseArticleContent(rawContent: string): {
 /**
  * Serializes the article content and associated image metadata together.
  * Preserves the exact position of [Gambar XX] in bodyText, and appends the
- * metadata block to persist url and title.
+ * metadata block to persist url, title, and storage_path.
  *
  * Guaranteed: bodyText is never lost, wiped out, or replaced by metadata.
  */
@@ -243,12 +320,18 @@ export function serializeArticleContent(
   // Only store images that are actively referenced in cleanBody
   const activeImages = images
     .filter((img) => cleanBody.toLowerCase().includes(img.placeholder.toLowerCase()))
-    .map((img) => ({
-      id: img.id,
-      placeholder: img.placeholder,
-      image_url: img.image_url || img.url || '',
-      image_title: img.image_title !== undefined ? img.image_title : (img.title || ''),
-    }));
+    .map((img) => {
+      const entry: ArticleInlineImageData = {
+        id: img.id,
+        placeholder: img.placeholder,
+        image_url: img.image_url || img.url || '',
+        image_title: img.image_title !== undefined ? img.image_title : (img.title || ''),
+      };
+      if (img.storage_path) {
+        entry.storage_path = img.storage_path;
+      }
+      return entry;
+    });
 
   if (activeImages.length === 0) {
     return cleanBody;

@@ -5,6 +5,7 @@
 
 import { getSupabaseClient, isSupabaseConfigured } from './supabase';
 import { ArticleItem } from '../types';
+import { ArticleInlineImageData, buildInlineImageStoragePath } from '../utils/articleImageUtils';
 
 export const MAX_COVER_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 export const ALLOWED_COVER_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -228,6 +229,90 @@ export const articlesService = {
       const message = err instanceof Error ? err.message : 'Upload failed';
       console.error('Exception during cover image upload:', message);
       return { success: false, error: message };
+    }
+  },
+
+  /**
+   * Upload an article inline image to Supabase Storage bucket 'article-covers'
+   * automatically renamed to: [Article Name]/[Image Inline Title].[Original Image Extension]
+   *
+   * Example:
+   * article_name: "Steal Like an Artist"
+   * image_inline_title: "Gambar 01"
+   * original_extension: "png"
+   * result_filename: "Steal Like an Artist/Gambar 01.png"
+   */
+  async uploadInlineImage(
+    file: File,
+    articleTitle: string,
+    imageInlineTitle: string,
+    existingImages: ArticleInlineImageData[] = []
+  ): Promise<{ success: boolean; publicUrl?: string; storagePath?: string; filename?: string; error?: string }> {
+    if (!ALLOWED_COVER_MIME_TYPES.includes(file.type)) {
+      return { success: false, error: 'Invalid file format. Please upload JPG, PNG, or WEBP image.' };
+    }
+
+    if (file.size > MAX_COVER_SIZE_BYTES) {
+      return { success: false, error: 'File size exceeds 5MB limit.' };
+    }
+
+    const client = getSupabaseClient();
+    if (!isSupabaseConfigured() || !client) {
+      return { success: false, error: 'Supabase storage is not configured.' };
+    }
+
+    // Preserve original image extension, ignoring user's original filename
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 
+                    (file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg');
+
+    const existingPaths = existingImages
+      .map((img) => img.storage_path)
+      .filter((p): p is string => Boolean(p));
+
+    // Construct renamed storage path: [Article Name]/[Image Inline Title].[Original Image Extension]
+    const storagePath = buildInlineImageStoragePath(
+      articleTitle || 'Untitled Article',
+      imageInlineTitle || 'Gambar 01',
+      fileExt,
+      existingPaths
+    );
+
+    try {
+      const { error: uploadError } = await client.storage
+        .from('article-covers')
+        .upload(storagePath, file, { cacheControl: '3600', upsert: true, contentType: file.type });
+
+      if (uploadError) {
+        console.error('Supabase inline image upload error:', uploadError.message);
+        return { success: false, error: uploadError.message };
+      }
+
+      const { data } = client.storage.from('article-covers').getPublicUrl(storagePath);
+      return { success: true, publicUrl: data.publicUrl, storagePath, filename: storagePath };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Inline image upload failed';
+      console.error('Exception during inline image upload:', message);
+      return { success: false, error: message };
+    }
+  },
+
+  /**
+   * Delete an inline image from Supabase Storage by its stored storage path.
+   */
+  async deleteInlineImage(storagePath: string): Promise<boolean> {
+    const client = getSupabaseClient();
+    if (!isSupabaseConfigured() || !client || !storagePath) return false;
+
+    try {
+      const { error } = await client.storage.from('article-covers').remove([storagePath]);
+      if (error) {
+        console.error('Failed to delete inline image from storage:', error.message);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Exception deleting inline image from storage:', err);
+      return false;
     }
   },
 

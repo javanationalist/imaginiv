@@ -4,13 +4,22 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
-import { Image as ImageIcon, Check, ExternalLink, HelpCircle } from 'lucide-react';
+import {
+  Image as ImageIcon,
+  Check,
+  Upload,
+  Loader2,
+  AlertCircle,
+  HardDrive,
+  FileText,
+} from 'lucide-react';
 import {
   ArticleInlineImageData,
   getNextPlaceholder,
   normalizePlaceholder,
   placeholderToId,
 } from '../../utils/articleImageUtils';
+import { articlesService } from '../../services/articlesService';
 
 export interface ArticleContentEditorRef {
   insertImageAtCursor: () => void;
@@ -22,6 +31,7 @@ interface ArticleContentEditorProps {
   onChange: (value: string) => void;
   inlineImages: ArticleInlineImageData[];
   onImagesChange: (images: ArticleInlineImageData[]) => void;
+  articleTitle?: string;
 }
 
 /**
@@ -71,12 +81,19 @@ function getCaretCoordinates(element: HTMLTextAreaElement, position: number) {
 }
 
 export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleContentEditorProps>(
-  ({ content, onChange, inlineImages, onImagesChange }, ref) => {
+  ({ content, onChange, inlineImages, onImagesChange, articleTitle = '' }, ref) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [activePlaceholder, setActivePlaceholder] = useState<string | null>(null);
     const [floatingPos, setFloatingPos] = useState<{ top: number; left: number } | null>(null);
+
+    // Uploading state
+    const [uploadingPlaceholder, setUploadingPlaceholder] = useState<string | null>(null);
+    const [uploadErrorMessage, setUploadErrorMessage] = useState<string | null>(null);
+
+    const popupFileInputRef = useRef<HTMLInputElement>(null);
+    const cardFileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
     // Position floating configuration popup directly below the active [Gambar XX] placeholder
     const updatePopupPosition = useCallback(() => {
@@ -101,10 +118,10 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
 
       // Calculate position relative to container
       const relativeTop = pos.top - textarea.scrollTop + pos.height + 6;
-      const maxLeft = Math.max(12, container.clientWidth - 380);
+      const maxLeft = Math.max(12, container.clientWidth - 400);
       const relativeLeft = Math.max(12, Math.min(pos.left, maxLeft));
 
-      if (relativeTop > 10 && relativeTop < textarea.clientHeight + 40) {
+      if (relativeTop > 10 && relativeTop < textarea.clientHeight + 60) {
         setFloatingPos({ top: relativeTop, left: relativeLeft });
       } else {
         setFloatingPos(null);
@@ -275,6 +292,65 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
       onImagesChange(updated);
     };
 
+    // Upload inline image file directly to Supabase Storage with automatic renaming:
+    // [Article Name]/[Image Inline Title].[Original Image Extension]
+    const handleUploadImage = async (placeholder: string, file: File) => {
+      if (!file) return;
+
+      const canonical = normalizePlaceholder(placeholder).toLowerCase();
+      const existing = inlineImages.find(
+        (img) => normalizePlaceholder(img.placeholder).toLowerCase() === canonical
+      );
+
+      // Determine inline title: use admin's title if present, otherwise default to placeholder name (e.g. "Gambar 01")
+      const currentTitle = (existing?.image_title || existing?.title || '').trim();
+      const inlineTitleToUse = currentTitle || placeholder.replace(/[\[\]]/g, '').trim();
+
+      setUploadingPlaceholder(placeholder);
+      setUploadErrorMessage(null);
+
+      const result = await articlesService.uploadInlineImage(
+        file,
+        articleTitle || 'Untitled Article',
+        inlineTitleToUse,
+        inlineImages
+      );
+
+      setUploadingPlaceholder(null);
+
+      if (result.success && result.publicUrl && result.storagePath) {
+        const updated = inlineImages.map((img) => {
+          if (normalizePlaceholder(img.placeholder).toLowerCase() === canonical) {
+            return {
+              ...img,
+              image_url: result.publicUrl!,
+              storage_path: result.storagePath!,
+              image_title: currentTitle || inlineTitleToUse,
+              url: result.publicUrl!,
+              title: currentTitle || inlineTitleToUse,
+            };
+          }
+          return img;
+        });
+
+        if (!updated.some((img) => normalizePlaceholder(img.placeholder).toLowerCase() === canonical)) {
+          updated.push({
+            id: placeholderToId(placeholder),
+            placeholder: normalizePlaceholder(placeholder),
+            image_url: result.publicUrl,
+            storage_path: result.storagePath,
+            image_title: currentTitle || inlineTitleToUse,
+            url: result.publicUrl,
+            title: currentTitle || inlineTitleToUse,
+          });
+        }
+
+        onImagesChange(updated);
+      } else {
+        setUploadErrorMessage(result.error || 'Failed to upload image.');
+      }
+    };
+
     // Extract all placeholders currently present in content
     const placeholdersInContent: string[] = [];
     const phRegex = /\[(?:gambar\s*|image\s*)(\d+)\]/gi;
@@ -320,7 +396,7 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
           {/* Small Image Configuration Popup directly below the active [Gambar XX] placeholder */}
           {activeImage && floatingPos && (
             <div
-              className="absolute z-30 p-3.5 rounded-2xl bg-[#FFFBF2] border-2 border-[#8B5226] shadow-[0_8px_24px_rgba(43,19,2,0.35)] animate-in fade-in zoom-in-95 duration-150 w-72 sm:w-96"
+              className="absolute z-30 p-3.5 rounded-2xl bg-[#FFFBF2] border-2 border-[#8B5226] shadow-[0_8px_24px_rgba(43,19,2,0.35)] animate-in fade-in zoom-in-95 duration-150 w-80 sm:w-[420px]"
               style={{ top: `${floatingPos.top}px`, left: `${floatingPos.left}px` }}
             >
               <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-[#D6BC90]">
@@ -332,7 +408,10 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActivePlaceholder(null)}
+                  onClick={() => {
+                    setActivePlaceholder(null);
+                    setUploadErrorMessage(null);
+                  }}
                   className="p-1 rounded-md hover:bg-[#F3E2BD] text-[#52BE1A] cursor-pointer"
                   title="Done"
                 >
@@ -340,14 +419,106 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                 </button>
               </div>
 
-              <div className="space-y-2.5">
-                {/* Image URL input */}
+              {uploadErrorMessage && (
+                <div className="mb-2 p-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{uploadErrorMessage}</span>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                {/* 1. Image Title / Caption input */}
                 <div className="space-y-1">
                   <label className="text-[11px] font-bold text-[#381E0A] flex items-center justify-between">
-                    <span>Image URL:</span>
+                    <span>Image title:</span>
+                    <span className="text-[10px] text-[#9C7955]">Used for caption &amp; filename</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={activeImage.image_title !== undefined ? activeImage.image_title : (activeImage.title || '')}
+                    onChange={(e) => handleUpdateImageTitle(activeImage.placeholder, e.target.value)}
+                    placeholder={activeImage.placeholder.replace(/[\[\]]/g, '') || 'Enter image title...'}
+                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#D6BC90] rounded-lg text-[#381E0A] focus:outline-none focus:border-[#2F8FE0]"
+                  />
+                  <p className="text-[10px] text-[#9C7955]">
+                    Rendered centered directly below the image on the article page.
+                  </p>
+                </div>
+
+                {/* 2. Upload to Supabase Storage Button & Status */}
+                <div className="p-2.5 rounded-xl bg-[#FAF0D4]/70 border border-[#D6BC90] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-[#5C3210] flex items-center gap-1.5">
+                      <Upload className="w-3.5 h-3.5 text-[#2F8FE0]" />
+                      Upload to Supabase Storage:
+                    </span>
+                    {activeImage.storage_path ? (
+                      <span className="text-[10px] font-semibold text-[#2A7513] bg-[#EBF7E6] px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Stored
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <input
+                    type="file"
+                    ref={popupFileInputRef}
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleUploadImage(activeImage.placeholder, file);
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={uploadingPlaceholder === activeImage.placeholder}
+                      onClick={() => popupFileInputRef.current?.click()}
+                      className="px-3 py-1.5 rounded-lg bg-[#2F8FE0] hover:bg-[#2578be] text-white text-xs font-bold shadow-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      {uploadingPlaceholder === activeImage.placeholder ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>{activeImage.storage_path ? 'Replace Image File' : 'Upload Image File'}</span>
+                        </>
+                      )}
+                    </button>
+
+                    <span className="text-[10px] text-[#9C7955]">
+                      Max 5MB (JPG, PNG, WEBP)
+                    </span>
+                  </div>
+
+                  {/* Display generated storage path if uploaded */}
+                  {activeImage.storage_path && (
+                    <div className="mt-1.5 pt-1.5 border-t border-[#D6BC90]/60 flex items-start gap-1.5 text-[10px] text-[#7C471E]">
+                      <HardDrive className="w-3 h-3 text-[#2F8FE0] shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <span className="font-semibold block text-[#381E0A]">Storage Path:</span>
+                        <code className="font-mono text-[9.5px] bg-white/80 px-1 py-0.5 rounded border border-[#D6BC90]/50 block break-all text-[#2F8FE0]">
+                          {activeImage.storage_path}
+                        </code>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Image URL input (fallback / external link) */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-[#381E0A] flex items-center justify-between">
+                    <span>Or direct Image URL:</span>
                     {activeImage.image_url && (
                       <span className="text-[10px] text-[#52BE1A] font-semibold flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Link configured
+                        <Check className="w-3 h-3" /> Ready
                       </span>
                     )}
                   </label>
@@ -357,31 +528,13 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                     onChange={(e) => handleUpdateImageUrl(activeImage.placeholder, e.target.value)}
                     placeholder="https://example.com/photo.jpg"
                     className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#D6BC90] rounded-lg text-[#381E0A] focus:outline-none focus:border-[#2F8FE0]"
-                    autoFocus={!activeImage.image_url}
                   />
                 </div>
 
-                {/* Image Title / Caption input */}
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-[#381E0A]">
-                    Image title:
-                  </label>
-                  <input
-                    type="text"
-                    value={activeImage.image_title !== undefined ? activeImage.image_title : (activeImage.title || '')}
-                    onChange={(e) => handleUpdateImageTitle(activeImage.placeholder, e.target.value)}
-                    placeholder="Enter image title..."
-                    className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#D6BC90] rounded-lg text-[#381E0A] focus:outline-none focus:border-[#2F8FE0]"
-                  />
-                  <p className="text-[10px] text-[#9C7955]">
-                    Rendered centered directly below the image on the article page.
-                  </p>
-                </div>
-
-                {/* Image thumbnail preview */}
+                {/* 4. Image thumbnail preview */}
                 {activeImage.image_url && (
-                  <div className="pt-1 flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-lg overflow-hidden border border-[#D6BC90] bg-[#FAF2DF] shrink-0">
+                  <div className="pt-1 flex items-center gap-2.5 bg-white/60 p-2 rounded-xl border border-[#D6BC90]">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-[#D6BC90] bg-[#FAF2DF] shrink-0">
                       <img
                         src={activeImage.image_url}
                         alt=""
@@ -393,10 +546,10 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="text-[11px] font-bold text-[#381E0A] truncate">
-                        {activeImage.image_title || 'Untitled Image'}
+                        {activeImage.image_title || activeImage.placeholder}
                       </div>
                       <div className="text-[10px] text-[#7C471E] font-mono truncate">
-                        {activeImage.image_url}
+                        {activeImage.storage_path || activeImage.image_url}
                       </div>
                     </div>
                   </div>
@@ -417,7 +570,7 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                 </h4>
               </div>
               <span className="text-[11px] text-[#9C7955]">
-                Positioned in-flow at each [Gambar XX] placeholder
+                Renamed automatically: <code className="font-mono text-[#2F8FE0] bg-white px-1 py-0.5 rounded border border-[#D6BC90]/60">[Article Name]/[Image Inline Title].[ext]</code>
               </span>
             </div>
 
@@ -433,11 +586,12 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                 };
 
                 const isConfigured = Boolean(imgData.image_url);
+                const hasStoragePath = Boolean(imgData.storage_path);
 
                 return (
                   <div
                     key={ph}
-                    className={`p-3 rounded-xl border bg-white space-y-2 transition-all ${
+                    className={`p-3 rounded-xl border bg-white space-y-2.5 transition-all ${
                       activePlaceholder === ph
                         ? 'border-[#2F8FE0] ring-2 ring-[#2F8FE0]/20'
                         : 'border-[#D6BC90]/80'
@@ -450,12 +604,14 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                         </span>
                         <span
                           className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                            isConfigured
+                            hasStoragePath
                               ? 'bg-[#EBF7E6] text-[#2A7513]'
+                              : isConfigured
+                              ? 'bg-[#EBF5FB] text-[#1E6091]'
                               : 'bg-[#FEF3C7] text-[#92400E]'
                           }`}
                         >
-                          {isConfigured ? 'Ready' : 'Missing URL'}
+                          {hasStoragePath ? 'Storage Uploaded' : isConfigured ? 'URL Ready' : 'Pending Image'}
                         </span>
                       </div>
 
@@ -463,7 +619,6 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                         type="button"
                         onClick={() => {
                           setActivePlaceholder(ph);
-                          // Scroll to placeholder in textarea
                           if (textareaRef.current) {
                             const idx = content.toLowerCase().indexOf(ph.toLowerCase());
                             if (idx !== -1) {
@@ -474,11 +629,80 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                         }}
                         className="text-[11px] font-bold text-[#2F8FE0] hover:underline cursor-pointer"
                       >
-                        Locate
+                        Locate in Text
                       </button>
                     </div>
 
-                    <div className="space-y-1.5 text-xs">
+                    <div className="space-y-2 text-xs">
+                      {/* Image title */}
+                      <div>
+                        <label className="text-[10px] font-bold text-[#7C471E] block mb-0.5">
+                          Image title (caption &amp; filename):
+                        </label>
+                        <input
+                          type="text"
+                          value={imgData.image_title !== undefined ? imgData.image_title : (imgData.title || '')}
+                          onChange={(e) => handleUpdateImageTitle(ph, e.target.value)}
+                          placeholder={ph.replace(/[\[\]]/g, '') || 'Enter image title...'}
+                          className="w-full px-2.5 py-1 text-xs bg-[#FFFBF2] border border-[#D6BC90] rounded-lg text-[#381E0A] focus:outline-none focus:border-[#2F8FE0]"
+                        />
+                      </div>
+
+                      {/* Upload button & Storage Path */}
+                      <div className="p-2 rounded-lg bg-[#FAF0D4]/50 border border-[#D6BC90]/70 flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold text-[#5C3210]">
+                            File Storage:
+                          </span>
+
+                          <input
+                            type="file"
+                            ref={(el) => {
+                              cardFileInputRefs.current[ph] = el;
+                            }}
+                            accept="image/jpeg,image/png,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleUploadImage(ph, file);
+                                e.target.value = '';
+                              }
+                            }}
+                          />
+
+                          <button
+                            type="button"
+                            disabled={uploadingPlaceholder === ph}
+                            onClick={() => cardFileInputRefs.current[ph]?.click()}
+                            className="px-2 py-1 rounded bg-[#2F8FE0] hover:bg-[#2578be] text-white text-[10px] font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                          >
+                            {uploadingPlaceholder === ph ? (
+                              <>
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                                <span>Uploading...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-3 h-3" />
+                                <span>{imgData.storage_path ? 'Replace' : 'Upload File'}</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {imgData.storage_path ? (
+                          <div className="text-[9.5px] font-mono text-[#2F8FE0] bg-white px-1.5 py-0.5 rounded border border-[#D6BC90]/50 truncate" title={imgData.storage_path}>
+                            📁 {imgData.storage_path}
+                          </div>
+                        ) : (
+                          <span className="text-[9.5px] text-[#9C7955] italic">
+                            Not uploaded yet. Will be saved as <span className="font-mono text-[#381E0A]">{(articleTitle || 'Article').trim()}/{(imgData.image_title || ph.replace(/[\[\]]/g, '')).trim()}.[ext]</span>
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Direct URL */}
                       <div>
                         <label className="text-[10px] font-bold text-[#7C471E] block mb-0.5">
                           Image URL:
@@ -488,22 +712,28 @@ export const ArticleContentEditor = forwardRef<ArticleContentEditorRef, ArticleC
                           value={imgData.image_url || imgData.url || ''}
                           onChange={(e) => handleUpdateImageUrl(ph, e.target.value)}
                           placeholder="https://example.com/photo.jpg"
-                          className="w-full px-2 py-1 text-xs bg-[#FFFBF2] border border-[#D6BC90] rounded-lg text-[#381E0A] focus:outline-none focus:border-[#2F8FE0]"
+                          className="w-full px-2.5 py-1 text-xs bg-[#FFFBF2] border border-[#D6BC90] rounded-lg text-[#381E0A] focus:outline-none focus:border-[#2F8FE0]"
                         />
                       </div>
 
-                      <div>
-                        <label className="text-[10px] font-bold text-[#7C471E] block mb-0.5">
-                          Image title:
-                        </label>
-                        <input
-                          type="text"
-                          value={imgData.image_title !== undefined ? imgData.image_title : (imgData.title || '')}
-                          onChange={(e) => handleUpdateImageTitle(ph, e.target.value)}
-                          placeholder="Enter image title..."
-                          className="w-full px-2 py-1 text-xs bg-[#FFFBF2] border border-[#D6BC90] rounded-lg text-[#381E0A] focus:outline-none focus:border-[#2F8FE0]"
-                        />
-                      </div>
+                      {/* Thumbnail if present */}
+                      {imgData.image_url && (
+                        <div className="flex items-center gap-2 pt-1 border-t border-[#D6BC90]/40">
+                          <div className="w-8 h-8 rounded overflow-hidden border border-[#D6BC90] bg-[#FAF2DF] shrink-0">
+                            <img
+                              src={imgData.image_url}
+                              alt=""
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-[#2A7513] font-semibold truncate">
+                            Preview loaded
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

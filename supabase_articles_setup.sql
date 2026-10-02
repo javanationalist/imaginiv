@@ -90,6 +90,12 @@ CREATE POLICY "Admin Upload Access for Article Covers"
     TO authenticated
     WITH CHECK (bucket_id = 'article-covers');
 
+CREATE POLICY "Admin Update Access for Article Covers"
+    ON storage.objects FOR UPDATE
+    TO authenticated
+    USING (bucket_id = 'article-covers')
+    WITH CHECK (bucket_id = 'article-covers');
+
 CREATE POLICY "Admin Delete Access for Article Covers"
     ON storage.objects FOR DELETE
     TO authenticated
