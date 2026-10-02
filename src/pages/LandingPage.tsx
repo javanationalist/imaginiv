@@ -16,6 +16,7 @@ import { BentoDirectoryCard, BentoCardData } from '../components/ui/BentoDirecto
 import { ForestBackdrop } from '../components/common/VillageArtwork';
 import { BannerSection } from '../components/ui/BannerSection';
 import { usePageVisibility } from '../context/PageVisibilityContext';
+import { scheduleCartoonPop } from '../utils/soundEffects';
 
 export const LandingPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -214,10 +215,12 @@ export const LandingPage: React.FC = () => {
             let batchIndex = 0;
             orderedBatch.forEach((id) => {
               if (!prev[id] || prev[id].state === 'hidden') {
+                const delay = Number((batchIndex * 0.12).toFixed(2));
                 next[id] = {
                   state: 'animating',
-                  delay: Number((batchIndex * 0.12).toFixed(2)),
+                  delay,
                 };
+                scheduleCartoonPop(delay, batchIndex);
                 batchIndex++;
               }
             });

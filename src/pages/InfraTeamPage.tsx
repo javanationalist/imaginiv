@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PageShell } from '../components/common/PageShell';
 import { ImaginersPageData, ImaginersMember } from '../types';
 import { imaginersService } from '../services/imaginersService';
 import { SocialIcon, formatSocialHref } from '../components/imaginers/SocialIcon';
+import { scheduleCartoonPop } from '../utils/soundEffects';
 
 export const InfraTeamPage: React.FC = () => {
   const [pageData, setPageData] = useState<ImaginersPageData>({
@@ -18,6 +19,18 @@ export const InfraTeamPage: React.FC = () => {
   });
   const [members, setMembers] = useState<ImaginersMember[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Trigger playful cartoon pop sound once on initial entrance animation
+  const hasPlayedEntranceSoundRef = useRef(false);
+
+  useEffect(() => {
+    if (!loading && members.length > 0 && !hasPlayedEntranceSoundRef.current) {
+      hasPlayedEntranceSoundRef.current = true;
+      members.forEach((_, idx) => {
+        scheduleCartoonPop(idx * 0.12, idx);
+      });
+    }
+  }, [loading, members]);
 
   // Dynamic Document Title
   useEffect(() => {
