@@ -186,96 +186,56 @@ export const LandingPage: React.FC = () => {
       return;
     }
 
-    const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+    // Unified Scroll-triggered Animation for both PC and Mobile:
+    // Animate Directory buttons as they enter the viewport (threshold 0.2)
+    // If multiple buttons become visible at approximately the same time, animate sequentially with 0.12s stagger delay
+    // Buttons further down wait until they actually enter the viewport
+    const cardObserver = new IntersectionObserver(
+      (entries) => {
+        const newlyIntersecting: string[] = [];
 
-    if (isDesktop) {
-      // DESKTOP BEHAVIOR:
-      // Trigger when approx 20% of the Directory section becomes visible
-      // Animate Directory buttons sequentially one by one in visual order with 0.12s stagger delay
-      const sectionEl = directorySectionRef.current || document.getElementById('directory');
-      if (!sectionEl) return;
-
-      const sectionObserver = new IntersectionObserver(
-        (entries) => {
-          const entry = entries[0];
-          if (entry && entry.isIntersecting && entry.intersectionRatio >= 0.18) {
-            setAnimatedItems((prev) => {
-              const next = { ...prev };
-              let staggerIndex = 0;
-              filteredItems.forEach((item) => {
-                if (!prev[item.id] || prev[item.id].state === 'hidden') {
-                  next[item.id] = {
-                    state: 'animating',
-                    delay: Number((staggerIndex * 0.12).toFixed(2)),
-                  };
-                  staggerIndex++;
-                }
-              });
-              return next;
-            });
-            sectionObserver.disconnect();
-          }
-        },
-        { threshold: 0.2 }
-      );
-
-      sectionObserver.observe(sectionEl);
-
-      return () => {
-        sectionObserver.disconnect();
-      };
-    } else {
-      // MOBILE BEHAVIOR:
-      // Animate Directory buttons individually based on when each button enters the viewport (threshold 0.2)
-      // If multiple buttons become visible at approximately the same time, animate sequentially with 0.12s stagger delay
-      // Buttons further down wait until they actually enter the viewport
-      const cardObserver = new IntersectionObserver(
-        (entries) => {
-          const newlyIntersecting: string[] = [];
-
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.18) {
-              const id = entry.target.getAttribute('data-directory-id');
-              if (id) {
-                newlyIntersecting.push(id);
-                cardObserver.unobserve(entry.target);
-              }
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.18) {
+            const id = entry.target.getAttribute('data-directory-id');
+            if (id) {
+              newlyIntersecting.push(id);
+              cardObserver.unobserve(entry.target);
             }
-          });
-
-          if (newlyIntersecting.length > 0) {
-            const orderedBatch = filteredItems
-              .map((it) => it.id)
-              .filter((id) => newlyIntersecting.includes(id));
-
-            setAnimatedItems((prev) => {
-              const next = { ...prev };
-              let batchIndex = 0;
-              orderedBatch.forEach((id) => {
-                if (!prev[id] || prev[id].state === 'hidden') {
-                  next[id] = {
-                    state: 'animating',
-                    delay: Number((batchIndex * 0.12).toFixed(2)),
-                  };
-                  batchIndex++;
-                }
-              });
-              return next;
-            });
           }
-        },
-        { threshold: 0.2 }
-      );
+        });
 
-      // Register cards in observer
-      cardElementsRef.current.forEach((el) => {
-        cardObserver.observe(el);
-      });
+        if (newlyIntersecting.length > 0) {
+          const orderedBatch = filteredItems
+            .map((it) => it.id)
+            .filter((id) => newlyIntersecting.includes(id));
 
-      return () => {
-        cardObserver.disconnect();
-      };
-    }
+          setAnimatedItems((prev) => {
+            const next = { ...prev };
+            let batchIndex = 0;
+            orderedBatch.forEach((id) => {
+              if (!prev[id] || prev[id].state === 'hidden') {
+                next[id] = {
+                  state: 'animating',
+                  delay: Number((batchIndex * 0.12).toFixed(2)),
+                };
+                batchIndex++;
+              }
+            });
+            return next;
+          });
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    // Register cards in observer
+    cardElementsRef.current.forEach((el) => {
+      cardObserver.observe(el);
+    });
+
+    return () => {
+      cardObserver.disconnect();
+    };
   }, [filteredItems, isSearching, isReducedMotion]);
 
   const handleAnimationEnd = (itemId: string) => {
