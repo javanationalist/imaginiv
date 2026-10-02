@@ -25,6 +25,12 @@ export const authService = {
       });
 
       if (error) {
+        if (
+          error.message.toLowerCase().includes('invalid login credentials') ||
+          error.message.toLowerCase().includes('invalid credentials')
+        ) {
+          return { user: null, error: 'Email or password incorrect' };
+        }
         return { user: null, error: error.message };
       }
 
@@ -69,7 +75,7 @@ export const authService = {
 
     return {
       user: null,
-      error: 'Invalid village administrator credentials. Password must be at least 6 characters.',
+      error: 'Email or password incorrect',
     };
   },
 

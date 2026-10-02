@@ -28,7 +28,15 @@ export const LoginPage: React.FC = () => {
     const params = new URLSearchParams(location.search);
     const oauthError = params.get('error_description') || params.get('error');
     if (oauthError) {
-      setError(decodeURIComponent(oauthError));
+      const decoded = decodeURIComponent(oauthError);
+      if (
+        decoded.toLowerCase().includes('invalid login credentials') ||
+        decoded.toLowerCase().includes('invalid credentials')
+      ) {
+        setError('Email or password incorrect');
+      } else {
+        setError(decoded);
+      }
     }
 
     // Verify current or freshly received session
@@ -68,7 +76,14 @@ export const LoginPage: React.FC = () => {
     setLoading(false);
 
     if (res.error) {
-      setError(res.error);
+      if (
+        res.error.toLowerCase().includes('invalid login credentials') ||
+        res.error.toLowerCase().includes('invalid credentials')
+      ) {
+        setError('Email or password incorrect');
+      } else {
+        setError(res.error);
+      }
     } else {
       navigate(from, { replace: true });
     }
@@ -105,7 +120,7 @@ export const LoginPage: React.FC = () => {
           to="/"
           className="game-btn-wood text-xs sm:text-sm !py-2 !px-4 inline-flex items-center justify-center"
         >
-          <span>Return to Village Map</span>
+          <span>Return to Village</span>
         </Link>
       </div>
 
@@ -156,7 +171,7 @@ export const LoginPage: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@imaginiv.site"
+                  placeholder="username@example.com"
                   className="w-full bg-[#FFFDF7] text-[#381E0A] placeholder-[#8C6B4E] text-sm font-bold pl-9 pr-3 py-2 rounded-xl border-2 border-[#542E10] focus:outline-none focus:ring-2 focus:ring-[#2F8FE0]"
                   required
                 />
@@ -178,6 +193,19 @@ export const LoginPage: React.FC = () => {
                   required
                 />
                 <KeyRound className="w-4 h-4 text-[#8C6B4E] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+
+              {/* Forgot password link */}
+              <div className="flex justify-end mt-1.5">
+                <a
+                  href="https://t.me/Wallshiu"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-bold text-[#2F8FE0] hover:text-[#1F6EAF] hover:underline inline-flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Contact support on Telegram"
+                >
+                  <span>Forgot password?</span>
+                </a>
               </div>
             </div>
 

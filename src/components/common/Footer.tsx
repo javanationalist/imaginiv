@@ -31,10 +31,14 @@ export const Footer: React.FC = () => {
             <img
               src={BRAND_ASSETS.logoUrl}
               alt="Imaginiv"
-              className="object-contain max-w-full"
-              style={{ width: '498.725px', height: '80px' }}
+              className="object-contain max-w-full w-auto h-24 sm:h-28 md:h-32 drop-shadow-md"
             />
           </Link>
+
+          {/* Centered All Rights Reserved Notice */}
+          <p className="mt-4 text-xs sm:text-sm font-sans text-[#FAF0D4]/80 tracking-wide text-center">
+            &copy; {new Date().getFullYear()} Imaginiv. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

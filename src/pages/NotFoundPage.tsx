@@ -50,7 +50,7 @@ export const NotFoundPage: React.FC = () => {
             className="game-btn-blue text-sm sm:text-base font-display inline-flex items-center gap-2 px-6 py-3 cursor-pointer"
           >
             <Home className="w-5 h-5" />
-            <span>Return to Village Map</span>
+            <span>Return to Village</span>
           </Link>
         </div>
       </div>
