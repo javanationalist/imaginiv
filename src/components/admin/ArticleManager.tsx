@@ -20,7 +20,8 @@ import {
   RefreshCw, 
   RotateCcw,
   Link as LinkIcon,
-  ExternalLink
+  ExternalLink,
+  Image as ImageIcon
 } from 'lucide-react';
 import { ArticleItem } from '../../types';
 import { articlesService } from '../../services/articlesService';
@@ -28,6 +29,15 @@ import { Modal } from '../common/Modal';
 import { MarkdownContent } from '../ui/MarkdownContent';
 import { getArticleShareUrl, getAppBasePath } from '../../utils/urlUtils';
 import { ArticleAdminRowSkeleton } from '../articles/ArticleSkeleton';
+import { ArticleContentEditor, ArticleContentEditorRef } from './ArticleContentEditor';
+import {
+  ArticleInlineImageData,
+  getNextPlaceholder,
+  parseArticleContent,
+  serializeArticleContent,
+  normalizePlaceholder,
+  placeholderToId,
+} from '../../utils/articleImageUtils';
 
 type EditorTab = 'write' | 'preview';
 
@@ -45,6 +55,7 @@ export const ArticleManager: React.FC = () => {
   const [isSlugManual, setIsSlugManual] = useState(false);
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
+  const [inlineImages, setInlineImages] = useState<ArticleInlineImageData[]>([]);
   const [author, setAuthor] = useState('Framedia Editorial');
   const [isPublished, setIsPublished] = useState(true);
 
@@ -61,6 +72,9 @@ export const ArticleManager: React.FC = () => {
 
   // Delete modal state
   const [articleToDelete, setArticleToDelete] = useState<ArticleItem | null>(null);
+
+  // Editor ref for cursor snippet and image insertion
+  const editorRef = useRef<ArticleContentEditorRef>(null);
 
   // Toast
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'saving' | 'saved' | 'error' } | null>(null);
@@ -121,6 +135,7 @@ export const ArticleManager: React.FC = () => {
     setIsSlugManual(false);
     setExcerpt('');
     setContent('');
+    setInlineImages([]);
     setAuthor('Framedia Editorial');
     setIsPublished(true);
     setCoverFile(null);
@@ -137,7 +152,13 @@ export const ArticleManager: React.FC = () => {
     setSlug(art.slug);
     setIsSlugManual(true);
     setExcerpt(art.excerpt || '');
-    setContent(art.content);
+    
+    // Parse content into clean bodyText and images metadata
+    const { bodyText, images } = parseArticleContent(art.content);
+    console.log(`[handleStartEdit] Loaded article ID: ${art.id}, raw length: ${art.content.length}, bodyText length: ${bodyText.length}, images found: ${images.length}`);
+    setContent(bodyText);
+    setInlineImages(images);
+
     setAuthor(art.author || 'Framedia Editorial');
     setIsPublished(art.is_published);
     setCoverFile(null);
@@ -155,6 +176,14 @@ export const ArticleManager: React.FC = () => {
     setCoverFile(file);
     const objectUrl = URL.createObjectURL(file);
     setCoverPreviewUrl(objectUrl);
+  };
+
+  const insertMarkdownSnippet = (snippet: string) => {
+    if (editorRef.current) {
+      editorRef.current.insertSnippet(snippet);
+    } else {
+      setContent((prev) => prev + snippet);
+    }
   };
 
   const handleSave = async (publishNow?: boolean) => {
@@ -193,13 +222,17 @@ export const ArticleManager: React.FC = () => {
       }
     }
 
+    // Serialize body text with inline images metadata
+    const finalContent = serializeArticleContent(content, inlineImages);
+    console.log(`[ArticleManager.handleSave] Submitting article: "${title}", bodyText length: ${content.length}, payload length: ${finalContent.length}`);
+
     if (editingArticleId) {
       // Update existing
       const result = await articlesService.updateArticle(editingArticleId, {
         title: title.trim(),
         slug: slug.trim() || undefined,
         excerpt: excerpt.trim() || null,
-        content: content.trim(),
+        content: finalContent,
         cover_image_url: finalCoverUrl,
         cover_image_path: finalCoverPath,
         author: author.trim() || 'Framedia Editorial',
@@ -208,7 +241,8 @@ export const ArticleManager: React.FC = () => {
 
       setSaving(false);
 
-      if (result.success) {
+      if (result.success && result.article) {
+        console.log(`[ArticleManager.handleSave] Successfully updated article ID ${editingArticleId}. Verified returned content length: ${result.article.content?.length}`);
         showToast('Article updated successfully!', 'saved');
         setViewMode('list');
         fetchArticles();
@@ -222,7 +256,7 @@ export const ArticleManager: React.FC = () => {
         title: title.trim(),
         slug: slug.trim() || undefined,
         excerpt: excerpt.trim() || undefined,
-        content: content.trim(),
+        content: finalContent,
         cover_image_url: finalCoverUrl || undefined,
         cover_image_path: finalCoverPath || undefined,
         author: author.trim() || 'Framedia Editorial',
@@ -231,7 +265,8 @@ export const ArticleManager: React.FC = () => {
 
       setSaving(false);
 
-      if (result.success) {
+      if (result.success && result.article) {
+        console.log(`[ArticleManager.handleSave] Successfully created article. Verified content length: ${result.article.content?.length}`);
         showToast('Article created and registered!', 'saved');
         setViewMode('list');
         fetchArticles();
@@ -257,10 +292,6 @@ export const ArticleManager: React.FC = () => {
       showToast('Failed to delete article.', 'error');
       fetchArticles();
     }
-  };
-
-  const insertMarkdownSnippet = (snippet: string) => {
-    setContent((prev) => prev + snippet);
   };
 
   const formatDate = (isoString?: string | null) => {
@@ -625,23 +656,36 @@ export const ArticleManager: React.FC = () => {
                       >
                         List
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => editorRef.current?.insertImageAtCursor()}
+                        className="px-2 py-0.5 rounded bg-[#FAF0D4] border border-[#D6BC90] hover:bg-[#F3E2BD] flex items-center gap-1 text-[#2F8FE0] font-bold cursor-pointer"
+                        title="Insert inline image placeholder [Gambar XX] at cursor position"
+                      >
+                        <ImageIcon className="w-3 h-3" />
+                        <span>Image</span>
+                      </button>
                     </div>
                   )}
                 </div>
 
-                {editorTab === 'write' ? (
-                  <textarea
-                    rows={16}
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Write article content in Markdown format... Use ## for headings, **bold**, *italic*, > blockquotes, and * bullet lists."
-                    className="w-full px-4 py-3 rounded-2xl border-2 border-[#D6BC90] bg-[#FFFBF2] text-[#381E0A] font-sans text-sm sm:text-base placeholder-[#9C7955] focus:outline-none focus:border-[#2F8FE0] transition-colors leading-relaxed"
+                <div className={editorTab === 'write' ? 'block' : 'hidden'}>
+                  <ArticleContentEditor
+                    ref={editorRef}
+                    content={content}
+                    onChange={setContent}
+                    inlineImages={inlineImages}
+                    onImagesChange={setInlineImages}
                   />
-                ) : (
+                </div>
+                <div className={editorTab === 'preview' ? 'block' : 'hidden'}>
                   <div className="p-6 rounded-2xl bg-white border-2 border-[#D6BC90] min-h-[380px]">
-                    <MarkdownContent content={content || '*No content entered yet.*'} />
+                    <MarkdownContent
+                      content={content || '*No content entered yet.*'}
+                      inlineImages={inlineImages}
+                    />
                   </div>
-                )}
+                </div>
               </div>
             </div>
 

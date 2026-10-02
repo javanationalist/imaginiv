@@ -331,7 +331,15 @@ export const articlesService = {
       if (data.title !== undefined) updatePayload.title = data.title.trim();
       if (finalSlug !== undefined) updatePayload.slug = finalSlug;
       if (data.excerpt !== undefined) updatePayload.excerpt = data.excerpt?.trim() || null;
-      if (data.content !== undefined) updatePayload.content = data.content.trim();
+      if (data.content !== undefined) {
+        const trimmedContent = data.content.trim();
+        if (!trimmedContent) {
+          console.error('[articlesService.updateArticle] ABORTED: Attempted to update article with empty content! Article ID:', id);
+          return { success: false, error: 'Article content cannot be empty. Update was aborted to prevent data loss.' };
+        }
+        console.log(`[articlesService.updateArticle] Updating article ID ${id} with content length ${trimmedContent.length}`);
+        updatePayload.content = trimmedContent;
+      }
       if (data.cover_image_url !== undefined) updatePayload.cover_image_url = data.cover_image_url;
       if (data.cover_image_path !== undefined) updatePayload.cover_image_path = data.cover_image_path;
       if (data.author !== undefined) updatePayload.author = data.author?.trim() || null;
