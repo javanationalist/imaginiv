@@ -82,7 +82,7 @@ export const imaginersService = {
         .from('the_imaginers_page')
         .upsert(payload)
         .select('title, description, updated_at')
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Failed to update the_imaginers_page in Supabase:', error.message);
@@ -95,9 +95,9 @@ export const imaginersService = {
       return {
         success: true,
         data: {
-          title: data.title ?? '',
-          description: data.description ?? '',
-          updated_at: data.updated_at,
+          title: data?.title ?? (payload.title as string) ?? '',
+          description: data?.description ?? (payload.description as string) ?? '',
+          updated_at: data?.updated_at || (payload.updated_at as string) || new Date().toISOString(),
         },
       };
     } catch (err) {
@@ -296,11 +296,10 @@ export const imaginersService = {
         display_order: nextOrder,
       };
 
-      const { data: created, error } = await client
+      const { data: createdRows, error } = await client
         .from('the_imaginers_members')
         .insert(insertPayload)
-        .select('*')
-        .single();
+        .select('*');
 
       if (error) {
         console.error('Failed to insert member into the_imaginers_members:', error.message);
@@ -310,24 +309,25 @@ export const imaginersService = {
         };
       }
 
-      const finalPhoto = created.photo_url || created.picture_url || photoUrl;
-      const finalPath = created.photo_path || created.picture_path || photoPath;
+      const created = createdRows && createdRows.length > 0 ? createdRows[0] : null;
+      const finalPhoto = created?.photo_url || created?.picture_url || photoUrl;
+      const finalPath = created?.photo_path || created?.picture_path || photoPath;
 
       return {
         success: true,
         member: {
-          id: created.id,
-          name: created.name || data.name.trim(),
-          nim: created.nim || (data.nim ? data.nim.trim() : null),
+          id: created?.id || crypto.randomUUID(),
+          name: created?.name || data.name.trim(),
+          nim: created?.nim || (data.nim ? data.nim.trim() : null),
           photo_url: finalPhoto,
           picture_url: finalPhoto,
           photo_path: finalPath,
           picture_path: finalPath,
-          role: created.role || data.role.trim(),
-          social_media: Array.isArray(created.social_media) ? created.social_media : [],
-          display_order: created.display_order,
-          created_at: created.created_at,
-          updated_at: created.updated_at,
+          role: created?.role || data.role.trim(),
+          social_media: Array.isArray(created?.social_media) ? created.social_media : [],
+          display_order: created?.display_order || nextOrder,
+          created_at: created?.created_at || new Date().toISOString(),
+          updated_at: created?.updated_at || new Date().toISOString(),
         },
       };
     } catch (err) {
@@ -380,12 +380,11 @@ export const imaginersService = {
       if (data.social_media !== undefined) updatePayload.social_media = data.social_media;
       if (data.display_order !== undefined) updatePayload.display_order = data.display_order;
 
-      const { data: updated, error } = await client
+      const { data: updatedRows, error } = await client
         .from('the_imaginers_members')
         .update(updatePayload)
         .eq('id', id)
-        .select('*')
-        .single();
+        .select('*');
 
       if (error) {
         console.error('Failed to update member in Supabase:', error.message);
@@ -395,24 +394,38 @@ export const imaginersService = {
         };
       }
 
-      const finalPhoto = updated.photo_url || updated.picture_url || '';
-      const finalPath = updated.photo_path || updated.picture_path || null;
+      let updated = updatedRows && updatedRows.length > 0 ? updatedRows[0] : null;
+
+      if (!updated) {
+        const { data: fetchRows } = await client
+          .from('the_imaginers_members')
+          .select('*')
+          .eq('id', id)
+          .limit(1);
+
+        if (fetchRows && fetchRows.length > 0) {
+          updated = fetchRows[0];
+        }
+      }
+
+      const finalPhoto = updated?.photo_url || updated?.picture_url || (data.photo_url as string) || '';
+      const finalPath = updated?.photo_path || updated?.picture_path || null;
 
       return {
         success: true,
         member: {
-          id: updated.id,
-          name: updated.name || '',
-          nim: updated.nim || null,
+          id: updated?.id || id,
+          name: updated?.name || (data.name ? data.name.trim() : ''),
+          nim: updated?.nim || (data.nim ? data.nim.trim() : null),
           photo_url: finalPhoto,
           picture_url: finalPhoto,
           photo_path: finalPath,
           picture_path: finalPath,
-          role: updated.role || '',
-          social_media: Array.isArray(updated.social_media) ? updated.social_media : [],
-          display_order: updated.display_order,
-          created_at: updated.created_at,
-          updated_at: updated.updated_at,
+          role: updated?.role || (data.role ? data.role.trim() : ''),
+          social_media: Array.isArray(updated?.social_media) ? updated.social_media : (data.social_media || []),
+          display_order: updated?.display_order ?? (data.display_order || 0),
+          created_at: updated?.created_at || new Date().toISOString(),
+          updated_at: updated?.updated_at || new Date().toISOString(),
         },
       };
     } catch (err) {

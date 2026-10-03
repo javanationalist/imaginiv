@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   ArrowDown, 
   Search, 
@@ -19,6 +20,7 @@ import { usePageVisibility } from '../context/PageVisibilityContext';
 import { scheduleCartoonPop } from '../utils/soundEffects';
 
 export const LandingPage: React.FC = () => {
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const { isPageVisible, loading } = usePageVisibility();
 
@@ -27,14 +29,105 @@ export const LandingPage: React.FC = () => {
     Record<string, { state: 'hidden' | 'animating' | 'done'; delay: number }>
   >({});
   const directorySectionRef = useRef<HTMLElement | null>(null);
+  const heroAreaRef = useRef<HTMLDivElement | null>(null);
   const cardElementsRef = useRef<Map<string, HTMLElement>>(new Map());
 
-  const scrollToDirectory = () => {
-    const el = document.getElementById('directory');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+  // Persistent flag: true while #directory is the active navigation target
+  // and layout stabilization is completing.
+  const pendingDirectoryScrollRef = useRef<boolean>(false);
+
+  const scrollToDirectory = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    const el = directorySectionRef.current || document.getElementById('directory');
+    if (!el) return false;
+
+    const headerEl = document.getElementById('header');
+    const headerHeight = headerEl ? headerEl.offsetHeight : 64;
+    const targetY = Math.max(0, window.pageYOffset + el.getBoundingClientRect().top - headerHeight - 16);
+    
+    window.scrollTo({
+      top: targetY,
+      behavior,
+    });
+    return true;
+  }, []);
+
+  const isDirectoryTarget = location.hash === '#directory';
+
+  // 1. Initial mount and route change handler for #directory
+  useEffect(() => {
+    if (isDirectoryTarget) {
+      pendingDirectoryScrollRef.current = true;
+      let cancelled = false;
+      let frameId: number;
+      let attempts = 0;
+      const maxAttempts = 60; // Up to ~1s across 60fps frames
+
+      const tryScroll = () => {
+        if (cancelled) return;
+        const success = scrollToDirectory('smooth');
+        if (!success && attempts < maxAttempts) {
+          attempts++;
+          frameId = requestAnimationFrame(tryScroll);
+        }
+      };
+
+      frameId = requestAnimationFrame(tryScroll);
+
+      return () => {
+        cancelled = true;
+        cancelAnimationFrame(frameId);
+      };
+    } else {
+      pendingDirectoryScrollRef.current = false;
     }
-  };
+  }, [location.pathname, isDirectoryTarget, scrollToDirectory]);
+
+  // 2. Callback when banner data or image finishes loading
+  const handleBannerLoaded = useCallback(() => {
+    if (isDirectoryTarget && pendingDirectoryScrollRef.current) {
+      requestAnimationFrame(() => {
+        scrollToDirectory('smooth');
+      });
+    }
+  }, [isDirectoryTarget, scrollToDirectory]);
+
+  // 3. Re-align when page visibility loading finishes
+  useEffect(() => {
+    if (!loading && isDirectoryTarget && pendingDirectoryScrollRef.current) {
+      requestAnimationFrame(() => {
+        scrollToDirectory('smooth');
+      });
+    }
+  }, [loading, isDirectoryTarget, scrollToDirectory]);
+
+  // 4. ResizeObserver: Recalculate #directory position if banner/hero height shifts
+  useEffect(() => {
+    if (!isDirectoryTarget) return;
+
+    const heroEl = heroAreaRef.current;
+    if (!heroEl || typeof ResizeObserver === 'undefined') return;
+
+    let lastHeight = heroEl.offsetHeight;
+
+    const ro = new ResizeObserver((entries) => {
+      if (!pendingDirectoryScrollRef.current) return;
+      for (const entry of entries) {
+        const newHeight = entry.contentRect.height;
+        if (Math.abs(newHeight - lastHeight) > 8) {
+          lastHeight = newHeight;
+          requestAnimationFrame(() => {
+            scrollToDirectory('smooth');
+          });
+        }
+      }
+    });
+
+    ro.observe(heroEl);
+
+    return () => {
+      ro.disconnect();
+    };
+  }, [isDirectoryTarget, scrollToDirectory]);
 
   // The 7 official directory items matching exact site map & naming rule
   const directoryItems: BentoCardData[] = [
@@ -260,19 +353,21 @@ export const LandingPage: React.FC = () => {
       <Header />
 
       {/* 2. DEDICATED TOP BANNER SECTION (FULL-WIDTH EDGE-TO-EDGE, QUARTISAN STYLE) */}
-      <BannerSection />
+      <div ref={heroAreaRef}>
+        <BannerSection onBannerLoaded={handleBannerLoaded} />
 
-      {/* STANDALONE EXPLORE DIRECTORY CTA BUTTON (Placed below banner, outside the image) */}
-      <div className="w-full flex flex-col items-center justify-center pt-8 pb-3 px-4 relative z-10">
-        <button
-          type="button"
-          id="explore-directory-btn"
-          onClick={scrollToDirectory}
-          className="game-btn-blue text-base sm:text-lg font-display tracking-wide inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 sm:py-4 cursor-pointer justify-center shadow-[0_6px_0_#14436E,0_12px_24px_rgba(0,0,0,0.35)] hover:scale-105 active:scale-95 transition-transform"
-        >
-          <span>Explore</span>
-          <ArrowDown className="w-5 h-5" strokeWidth={2.5} />
-        </button>
+        {/* STANDALONE EXPLORE DIRECTORY CTA BUTTON (Placed below banner, outside the image) */}
+        <div className="w-full flex flex-col items-center justify-center pt-8 pb-3 px-4 relative z-10">
+          <button
+            type="button"
+            id="explore-directory-btn"
+            onClick={() => scrollToDirectory('smooth')}
+            className="game-btn-blue text-base sm:text-lg font-display tracking-wide inline-flex items-center gap-3 px-8 sm:px-10 py-3.5 sm:py-4 cursor-pointer justify-center shadow-[0_6px_0_#14436E,0_12px_24px_rgba(0,0,0,0.35)] hover:scale-105 active:scale-95 transition-transform"
+          >
+            <span>Explore</span>
+            <ArrowDown className="w-5 h-5" strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
 
       <main className="flex-1 w-full max-w-[1240px] mx-auto px-3 sm:px-6 relative z-10">

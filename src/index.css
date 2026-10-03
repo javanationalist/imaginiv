@@ -332,11 +332,10 @@
    GAME UI: CARTOON TYPOGRAPHY & TEXT STROKES
    ═══════════════════════════════════════════════════════════════ */
 
-/* Chunky 3D Cartoon Header Text with Dark Brown Outline (Like Smurfs' Village Popups) */
+/* 3D Header Text with Shadow Only (Outline/Stroke Removed) */
 .game-text-title {
   font-family: var(--font-display);
   color: #FFFFFF;
-  -webkit-text-stroke: 2px #381B07;
   text-shadow: 
     0 3px 0 #381B07,
     0 5px 0 #251003,

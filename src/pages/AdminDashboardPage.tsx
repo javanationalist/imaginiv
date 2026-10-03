@@ -27,7 +27,9 @@ import {
   Compass,
   Check,
   Info,
-  BookOpen
+  BookOpen,
+  Menu,
+  X
 } from 'lucide-react';
 import { authService } from '../services/authService';
 import { isSupabaseConfigured } from '../services/supabase';
@@ -124,31 +126,223 @@ export const AdminDashboardPage: React.FC = () => {
     }, 2800);
   };
 
-  const tabs = [
-    { id: 'visibility' as CMSTab, label: 'Page Visibility Control', icon: ToggleRight, isPrimary: true },
-    { id: 'banners' as CMSTab, label: 'Background Banners', icon: Images, isPrimary: true },
-    { id: 'articles' as CMSTab, label: 'Articles & Stories', icon: BookOpen, isPrimary: true },
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Grouped Menu Tabs as requested:
+  // 1. Page visibility control (Top item)
+  // 2. Manage: The Imaginers, Article, Project, Portfolio, Background Banners
+  // 3. More: Being Creative, AI Ethics, Inclusivity, Supabase Dashboard ↗
+  const manageTabs = [
+    { id: 'team' as CMSTab, label: 'The Imaginers', icon: Users, isPrimary: true },
+    { id: 'articles' as CMSTab, label: 'Article', icon: BookOpen, isPrimary: true },
     { id: 'projects' as CMSTab, label: 'Project', icon: Clapperboard },
     { id: 'portfolio' as CMSTab, label: 'Portfolio', icon: Images },
+    { id: 'banners' as CMSTab, label: 'Background Banners', icon: Images, isPrimary: true },
+  ];
+
+  const moreTabs = [
     { id: 'being_creative' as CMSTab, label: 'Being Creative', icon: Lightbulb },
-    { id: 'team' as CMSTab, label: 'The Imaginers', icon: Users, isPrimary: true },
     { id: 'ethics' as CMSTab, label: 'AI Ethics', icon: Scale },
     { id: 'inclusivity' as CMSTab, label: 'Inclusivity', icon: HeartHandshake },
   ];
 
-  const getActiveTabTitle = () => {
-    switch (activeTab) {
-      case 'visibility': return 'Page Visibility Control Center';
-      case 'banners': return 'Background Banners Management';
-      case 'articles': return 'Articles & Editorial Archive';
-      case 'projects': return 'Project Management';
-      case 'portfolio': return 'Portfolio Management';
-      case 'team': return 'The Imaginers Management';
-      case 'being_creative': return 'Being Creative Tenets';
-      case 'ethics': return 'AI Ethics Charter Management';
-      case 'inclusivity': return 'Inclusivity Framework';
+  const getTabDisplayName = (tab: CMSTab): string => {
+    switch (tab) {
+      case 'visibility': return 'Page Visibility Control';
+      case 'team': return 'The Imaginers';
+      case 'articles': return 'Article';
+      case 'projects': return 'Project';
+      case 'portfolio': return 'Portfolio';
+      case 'banners': return 'Background Banners';
+      case 'being_creative': return 'Being Creative';
+      case 'ethics': return 'AI Ethics';
+      case 'inclusivity': return 'Inclusivity';
+      default: return 'Village CMS Portal';
     }
   };
+
+  const getTabIcon = (tab: CMSTab): React.ElementType => {
+    switch (tab) {
+      case 'visibility': return ToggleRight;
+      case 'team': return Users;
+      case 'articles': return BookOpen;
+      case 'projects': return Clapperboard;
+      case 'portfolio': return Images;
+      case 'banners': return Images;
+      case 'being_creative': return Lightbulb;
+      case 'ethics': return Scale;
+      case 'inclusivity': return HeartHandshake;
+      default: return Shield;
+    }
+  };
+
+  const handleSelectTab = (tabId: CMSTab) => {
+    setActiveTab(tabId);
+    setIsMobileMenuOpen(false);
+  };
+
+  const renderSidebarContent = () => (
+    <div className="game-parchment p-3 sm:p-4 rounded-xl space-y-3.5">
+      {/* 1. Page visibility control */}
+      <div>
+        <button
+          type="button"
+          onClick={() => handleSelectTab('visibility')}
+          className={`
+            w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm font-display transition-all cursor-pointer text-left
+            ${activeTab === 'visibility'
+              ? 'bg-gradient-to-b from-[#67BDFF] to-[#146FBF] text-white border-2 border-[#093764] shadow-[0_2px_0_#062442]'
+              : 'bg-[#FAF0D4] text-[#4A2408] border border-[#CBB38B] hover:bg-[#F3E2BD]'}
+          `}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <ToggleRight className={`w-4 h-4 shrink-0 ${activeTab === 'visibility' ? 'text-white' : 'text-[#2F8FE0]'}`} />
+            <span className="truncate">Page visibility control</span>
+          </div>
+          <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${activeTab === 'visibility' ? 'bg-white/25 text-white' : 'bg-[#2F8FE0] text-white'}`}>
+            HOT
+          </span>
+        </button>
+      </div>
+
+      {/* 2. Manage */}
+      <div className="space-y-1">
+        <div className="px-2 py-1 text-[11px] font-display uppercase tracking-wider text-[#7C471E] flex items-center gap-1.5 border-b border-[#D6BC90] mb-1.5">
+          <Layers className="w-3.5 h-3.5" />
+          <span>Manage</span>
+        </div>
+
+        {manageTabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => handleSelectTab(tab.id)}
+              className={`
+                w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-display transition-all cursor-pointer text-left
+                ${isActive
+                  ? 'bg-gradient-to-b from-[#67BDFF] to-[#146FBF] text-white border-2 border-[#093764] shadow-[0_2px_0_#062442]'
+                  : tab.isPrimary
+                    ? 'bg-[#FAF0D4] text-[#4A2408] border border-[#CBB38B] hover:bg-[#F3E2BD]'
+                    : 'text-[#5C3210] hover:bg-[#FAF2DF] border border-transparent'}
+              `}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : tab.isPrimary ? 'text-[#2F8FE0]' : 'text-[#8B5226]'}`} />
+                <span className="truncate">{tab.label}</span>
+              </div>
+              {tab.isPrimary && (
+                <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white/25 text-white' : 'bg-[#2F8FE0] text-white'}`}>
+                  HOT
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 3. More */}
+      <div className="space-y-1">
+        <div className="px-2 py-1 text-[11px] font-display uppercase tracking-wider text-[#7C471E] flex items-center gap-1.5 border-b border-[#D6BC90] mb-1.5">
+          <Compass className="w-3.5 h-3.5" />
+          <span>More</span>
+        </div>
+
+        {moreTabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => handleSelectTab(tab.id)}
+              className={`
+                w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-display transition-all cursor-pointer text-left
+                ${isActive
+                  ? 'bg-gradient-to-b from-[#67BDFF] to-[#146FBF] text-white border-2 border-[#093764] shadow-[0_2px_0_#062442]'
+                  : 'text-[#5C3210] hover:bg-[#FAF2DF] border border-transparent'}
+              `}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-[#8B5226]'}`} />
+                <span className="truncate">{tab.label}</span>
+              </div>
+            </button>
+          );
+        })}
+
+        {/* Supabase Dashboard ↗ */}
+        <a
+          href="https://supabase.com/dashboard/project/yjrdbggomigcotijziqf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-display transition-all cursor-pointer text-left text-[#166E38] bg-[#E8F8F0] border border-[#B3E7CB] hover:bg-[#D5F2E3] hover:text-[#0C4F26]"
+          title="Open Supabase Dashboard in new tab"
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Database className="w-4 h-4 shrink-0 text-[#2A9755]" />
+            <span className="truncate">Supabase Dashboard</span>
+          </div>
+          <ExternalLink className="w-3.5 h-3.5 shrink-0 opacity-80" />
+        </a>
+      </div>
+
+      {/* 4. Footer: Supabase Engine */}
+      <div className="pt-3 border-t-2 border-[#D6BC90] text-[11px] text-[#7C471E] font-bold px-2 space-y-1.5">
+        <div className="flex items-center justify-between text-[#381E0A]">
+          <div className="flex items-center gap-1.5">
+            <Database className="w-3.5 h-3.5 text-[#2A7513]" />
+            <span>Supabase Engine</span>
+          </div>
+          <a
+            href="https://supabase.com/dashboard/project/yjrdbggomigcotijziqf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] text-[#1D7448] hover:text-[#0F472B] font-bold inline-flex items-center gap-1 hover:underline"
+            title="Open project dashboard in Supabase"
+          >
+            <span>Dashboard</span>
+            <ExternalLink className="w-2.5 h-2.5" />
+          </a>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured() ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+          <span className="text-[#2F6614] font-bold">
+            {isSupabaseConfigured() ? 'Connected' : 'Local Fallback'}
+          </span>
+        </div>
+        <div className="text-[10px] text-[#8C5226] font-normal leading-tight">
+          {isSupabaseConfigured()
+            ? 'Changes persist to PostgreSQL and broadcast live.'
+            : 'Changes save to local store. Add VITE_SUPABASE_URL for live cloud sync.'}
+        </div>
+      </div>
+
+      {/* 5. Account & Navigation Actions */}
+      <div className="pt-3 border-t-2 border-[#D6BC90] space-y-2">
+        <Link
+          to="/"
+          className="w-full game-btn-wood text-xs !py-2 !px-3 flex items-center justify-center gap-2 cursor-pointer shadow-[0_2px_0_#2B1302]"
+          title="Visit Live Page (Village Map)"
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+          <span>Visit Page</span>
+        </Link>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full game-btn-blue text-xs !py-2 !px-3 flex items-center justify-center gap-2 cursor-pointer"
+          title="Logout"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden text-[#381E0A]">
@@ -172,102 +366,82 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Admin Top Header */}
-      <header className="sticky top-0 z-30 w-full px-3 sm:px-6 pt-3">
-        <div className="max-w-[1240px] mx-auto game-wood-plank px-4 sm:px-6 py-2.5 flex items-center justify-between shadow-[0_4px_0_#2B1302]">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-b from-[#FFF8EC] to-[#EADBBD] border border-[#4A2306] text-[#8B5226] flex items-center justify-center font-bold shadow-xs">
-              <Shield className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="game-text-title text-base sm:text-lg leading-none">
-                Village CMS Portal
+      {/* Mobile Drawer (slides in from left) */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Dark Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Drawer Panel */}
+          <div className="fixed inset-y-0 left-0 w-[310px] max-w-[85vw] bg-[#7E481D] border-r-4 border-[#452106] shadow-[10px_0_35px_rgba(0,0,0,0.6)] z-50 flex flex-col p-4 overflow-y-auto animate-in slide-in-from-left duration-250">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-[#542B0D]">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-[#FFF8EC] to-[#EADBBD] border border-[#4A2306] text-[#8B5226] flex items-center justify-center font-bold">
+                  <Shield className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="game-text-title text-sm text-white leading-none">CMS Navigation</div>
+                  <div className="text-[10px] text-[#FFE8C2] mt-0.5 font-semibold">Admin Menu</div>
+                </div>
               </div>
-              <div className="text-[11px] text-[#FFE8C2] font-semibold mt-0.5 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="game-wood-circle-btn !w-8 !h-8 text-white cursor-pointer"
+                aria-label="Tutup menu"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 pb-4">
+              {renderSidebarContent()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Top Header (Sticky Top) */}
+      <header className="sticky top-0 z-30 w-full px-3 sm:px-6 pt-3">
+        <div className="max-w-[1240px] mx-auto game-wood-plank px-3 sm:px-6 py-2.5 flex items-center justify-between shadow-[0_4px_0_#2B1302]">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-b from-[#FFF8EC] to-[#EADBBD] border border-[#4A2306] text-[#8B5226] flex items-center justify-center font-bold shadow-xs shrink-0">
+              {React.createElement(getTabIcon(activeTab), { className: 'w-5 h-5 text-[#8B5226]' })}
+            </div>
+            <div className="min-w-0">
+              <div className="game-text-title text-sm sm:text-lg leading-tight truncate">
+                {getTabDisplayName(activeTab)}
+              </div>
+              <div className="text-[11px] text-[#FFE8C2] font-semibold mt-0.5 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)] truncate">
                 Administrator: {currentUser?.email || 'admin@imaginiv.site'}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              to="/"
-              className="game-btn-wood text-xs !py-1.5 !px-3 flex items-center gap-1.5"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Village Map</span>
-            </Link>
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="game-btn-blue text-xs !py-1.5 !px-3 flex items-center gap-1.5 cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Logout</span>
-            </button>
-          </div>
+          {/* Tombol Menu Mobile: Hanya menampilkan ikon tanpa teks keterangan */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="lg:hidden game-btn-wood !w-9 !h-9 !p-0 flex items-center justify-center cursor-pointer shrink-0 shadow-[0_3px_0_#2A1202]"
+            aria-label="Buka menu navigasi"
+            title="Menu Navigasi"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
         </div>
       </header>
 
       {/* Main Admin Content Container */}
       <main className="flex-1 w-full max-w-[1240px] mx-auto px-3 sm:px-6 py-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar Tabs */}
-          <aside className="lg:col-span-1">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+          {/* Desktop Fixed/Sticky Sidebar Tabs (always visible on PC/tablet and fixed while scrolling) */}
+          <aside className="hidden lg:block lg:col-span-1 sticky top-[76px] self-start max-h-[calc(100vh-90px)] overflow-y-auto pr-1">
             <div className="game-wood-frame p-3 sm:p-4 relative">
-              <div className="game-parchment p-3 sm:p-4 rounded-xl space-y-1.5">
-                <div className="px-2 py-1.5 text-xs font-display uppercase tracking-wider text-[#7C471E] flex items-center gap-2 border-b-2 border-[#D6BC90] mb-2">
-                  <Layers className="w-3.5 h-3.5" />
-                  <span>Village Controls</span>
-                </div>
-
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`
-                        w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-display transition-all cursor-pointer text-left
-                        ${isActive
-                          ? 'bg-gradient-to-b from-[#67BDFF] to-[#146FBF] text-white border-2 border-[#093764] shadow-[0_2px_0_#062442]'
-                          : tab.isPrimary
-                            ? 'bg-[#FAF0D4] text-[#4A2408] border border-[#CBB38B] hover:bg-[#F3E2BD]'
-                            : 'text-[#5C3210] hover:bg-[#FAF2DF] border border-transparent'}
-                      `}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : tab.isPrimary ? 'text-[#2F8FE0]' : 'text-[#8B5226]'}`} />
-                        <span className="truncate">{tab.label}</span>
-                      </div>
-                      {tab.isPrimary && (
-                        <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white/25 text-white' : 'bg-[#2F8FE0] text-white'}`}>
-                          HOT
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-
-                <div className="pt-3 mt-2 border-t-2 border-[#D6BC90] text-[11px] text-[#7C471E] font-bold px-2 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-[#381E0A]">
-                    <Database className="w-3.5 h-3.5 text-[#2A7513]" />
-                    <span>Supabase Engine</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured() ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                    <span>{isSupabaseConfigured() ? 'Supabase Connected' : 'Local Fallback Mode'}</span>
-                  </div>
-                  <div className="text-[10px] text-[#8C5226] font-normal leading-tight">
-                    {isSupabaseConfigured()
-                      ? 'Changes persist to PostgreSQL and broadcast live.'
-                      : 'Changes save to local store. Add VITE_SUPABASE_URL for live cloud sync.'}
-                  </div>
-                </div>
-              </div>
+              {renderSidebarContent()}
             </div>
           </aside>
 
@@ -276,34 +450,6 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="game-wood-frame p-4 sm:p-6 relative min-h-[460px] flex flex-col justify-between">
               <div className="game-parchment p-5 sm:p-7 rounded-xl flex-1 flex flex-col justify-between">
                 <div>
-                  {/* Sector Header */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b-2 border-[#D6BC90]">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="game-wood-pill text-[11px] font-bold px-2.5 py-0.5">
-                          Admin Management
-                        </span>
-                        <span className="text-xs font-bold text-[#6B492B]">
-                          {activePagesCount} of {pages.length} Sectors Active
-                        </span>
-                      </div>
-                      <h2 className="font-display text-2xl sm:text-3xl text-[#381E0A]">
-                        {getActiveTabTitle()}
-                      </h2>
-                    </div>
-
-                    {activeTab !== 'visibility' && activeTab !== 'banners' && activeTab !== 'articles' && activeTab !== 'team' && (
-                      <button
-                        type="button"
-                        onClick={() => setIsCreateModalOpen(true)}
-                        className="game-btn-blue text-xs sm:text-sm !py-2 !px-4 inline-flex items-center gap-2 cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4 text-white" />
-                        <span>Add Entry</span>
-                      </button>
-                    )}
-                  </div>
-
                   {/* TAB 1: PAGE VISIBILITY CONTROL CENTER */}
                   {activeTab === 'visibility' && (
                     <div className="my-6 space-y-4">
@@ -510,7 +656,7 @@ export const AdminDashboardPage: React.FC = () => {
         <Modal
           isOpen={true}
           onClose={() => setIsCreateModalOpen(false)}
-          title={`Create ${tabs.find(t => t.id === activeTab)?.label} Entry`}
+          title={`Create ${getTabDisplayName(activeTab)} Entry`}
         >
           {saveNotice ? (
             <div className="p-6 text-center space-y-3">

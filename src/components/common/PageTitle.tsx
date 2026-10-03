@@ -19,10 +19,10 @@ export const PageTitle: React.FC<PageTitleProps> = ({
   title,
 }) => {
   return (
-    <div className="w-full mb-6">
+    <div className="w-full">
       {/* Breadcrumb & Back to Village Map Action */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm font-bold text-[#381E0A]">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm font-bold text-[#381E0A] bg-[#FFF8EC]/90 backdrop-blur-xs px-3 sm:px-4 py-1.5 rounded-xl border-2 border-[#D6BC90] shadow-xs">
           <Link
             to="/"
             className="hover:text-[#2F8FE0] transition-colors inline-flex items-center gap-1.5 touch-target font-display"
@@ -43,3 +43,5 @@ export const PageTitle: React.FC<PageTitleProps> = ({
     </div>
   );
 };
+
+PageTitle.displayName = 'PageTitle';

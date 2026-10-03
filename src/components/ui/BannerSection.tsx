@@ -11,6 +11,7 @@ import { bannersService } from '../../services/bannersService';
 export interface BannerSectionProps {
   autoRotateInterval?: number; // default 7000ms (7s)
   className?: string;
+  onBannerLoaded?: () => void;
 }
 
 /**
@@ -22,6 +23,7 @@ export interface BannerSectionProps {
 export const BannerSection: React.FC<BannerSectionProps> = ({
   autoRotateInterval = 7000,
   className = '',
+  onBannerLoaded,
 }) => {
   const [banners, setBanners] = useState<BannerItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -37,12 +39,14 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
         if (isMounted) {
           setBanners(data);
           setIsLoaded(true);
+          onBannerLoaded?.();
         }
       } catch (err) {
         console.error('Failed to load active banners from Supabase:', err);
         if (isMounted) {
           setBanners([]);
           setIsLoaded(true);
+          onBannerLoaded?.();
         }
       }
     };
@@ -123,6 +127,9 @@ export const BannerSection: React.FC<BannerSectionProps> = ({
               alt={currentBanner.caption || 'Imaginiv Banner'}
               className="w-full h-full object-cover object-top p-0 m-0"
               loading="eager"
+              onLoad={() => {
+                onBannerLoaded?.();
+              }}
             />
           </motion.div>
         </AnimatePresence>

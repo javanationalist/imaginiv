@@ -79,7 +79,13 @@ export const Header: React.FC = () => {
       if (location.pathname === '/') {
         const el = document.getElementById(hash);
         if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
+          const headerEl = document.getElementById('header');
+          const headerHeight = headerEl ? headerEl.offsetHeight : 64;
+          const targetY = Math.max(0, window.pageYOffset + el.getBoundingClientRect().top - headerHeight - 16);
+          window.scrollTo({
+            top: targetY,
+            behavior: 'smooth',
+          });
         }
       }
     }

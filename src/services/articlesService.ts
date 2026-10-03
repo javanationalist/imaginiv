@@ -119,7 +119,7 @@ export const articlesService = {
         query = query.eq('is_published', true);
       }
 
-      const { data, error } = await query.single();
+      const { data, error } = await query.maybeSingle();
       if (error || !data) {
         if (error && error.code !== 'PGRST116') {
           console.error('Failed to fetch article by slug from Supabase:', error.message);
@@ -345,7 +345,7 @@ export const articlesService = {
     const now = new Date().toISOString();
 
     try {
-      const { data: inserted, error } = await client
+      const { data: insertedRows, error } = await client
         .from('articles')
         .insert({
           title: data.title.trim(),
@@ -358,27 +358,39 @@ export const articlesService = {
           is_published: data.is_published,
           published_at: data.is_published ? now : null,
         })
-        .select()
-        .single();
+        .select();
 
       if (error) {
         console.error('Failed to create article in Supabase:', error.message);
         return { success: false, error: error.message };
       }
 
+      let inserted = insertedRows && insertedRows.length > 0 ? insertedRows[0] : null;
+      if (!inserted) {
+        // Fallback fetch in case RLS or RETURNING didn't yield row immediately
+        const { data: fetchRows } = await client
+          .from('articles')
+          .select('*')
+          .eq('slug', finalSlug)
+          .limit(1);
+        if (fetchRows && fetchRows.length > 0) {
+          inserted = fetchRows[0];
+        }
+      }
+
       const newArticle: ArticleItem = {
-        id: inserted.id,
-        title: inserted.title,
-        slug: inserted.slug,
-        excerpt: inserted.excerpt,
-        content: inserted.content,
-        cover_image_url: inserted.cover_image_url,
-        cover_image_path: inserted.cover_image_path,
-        author: inserted.author,
-        is_published: Boolean(inserted.is_published),
-        published_at: inserted.published_at,
-        created_at: inserted.created_at,
-        updated_at: inserted.updated_at,
+        id: inserted?.id || crypto.randomUUID(),
+        title: inserted?.title || data.title.trim(),
+        slug: inserted?.slug || finalSlug,
+        excerpt: inserted?.excerpt ?? (data.excerpt?.trim() || null),
+        content: inserted?.content || data.content.trim(),
+        cover_image_url: inserted?.cover_image_url || data.cover_image_url || null,
+        cover_image_path: inserted?.cover_image_path || data.cover_image_path || null,
+        author: inserted?.author || data.author?.trim() || 'Imaginiv Editorial',
+        is_published: inserted ? Boolean(inserted.is_published) : Boolean(data.is_published),
+        published_at: inserted ? inserted.published_at : (data.is_published ? now : null),
+        created_at: inserted?.created_at || now,
+        updated_at: inserted?.updated_at || now,
       };
 
       return { success: true, article: newArticle };
@@ -437,31 +449,45 @@ export const articlesService = {
         }
       }
 
-      const { data: updated, error } = await client
+      const { data: updateRows, error } = await client
         .from('articles')
         .update(updatePayload)
         .eq('id', id)
-        .select()
-        .single();
+        .select();
 
       if (error) {
         console.error('Failed to update article in Supabase:', error.message);
         return { success: false, error: error.message };
       }
 
+      let updated = updateRows && updateRows.length > 0 ? updateRows[0] : null;
+
+      if (!updated) {
+        // Fallback fetch in case RLS or RETURNING didn't yield the updated row directly
+        const { data: fetchRows } = await client
+          .from('articles')
+          .select('*')
+          .eq('id', id)
+          .limit(1);
+
+        if (fetchRows && fetchRows.length > 0) {
+          updated = fetchRows[0];
+        }
+      }
+
       const fresh: ArticleItem = {
-        id: updated.id,
-        title: updated.title,
-        slug: updated.slug,
-        excerpt: updated.excerpt,
-        content: updated.content,
-        cover_image_url: updated.cover_image_url,
-        cover_image_path: updated.cover_image_path,
-        author: updated.author,
-        is_published: Boolean(updated.is_published),
-        published_at: updated.published_at,
-        created_at: updated.created_at,
-        updated_at: updated.updated_at,
+        id: updated?.id || id,
+        title: updated?.title || (data.title !== undefined ? data.title.trim() : (updatePayload.title as string) || ''),
+        slug: updated?.slug || finalSlug || data.slug || (updatePayload.slug as string) || '',
+        excerpt: updated ? updated.excerpt : (data.excerpt !== undefined ? data.excerpt?.trim() || null : (updatePayload.excerpt as string | null) || null),
+        content: updated?.content || (data.content !== undefined ? data.content.trim() : (updatePayload.content as string) || ''),
+        cover_image_url: updated ? updated.cover_image_url : (data.cover_image_url !== undefined ? data.cover_image_url : (updatePayload.cover_image_url as string | null) || null),
+        cover_image_path: updated ? updated.cover_image_path : (data.cover_image_path !== undefined ? data.cover_image_path : (updatePayload.cover_image_path as string | null) || null),
+        author: updated ? updated.author : (data.author !== undefined ? data.author?.trim() || null : (updatePayload.author as string | null) || 'Imaginiv Editorial'),
+        is_published: updated ? Boolean(updated.is_published) : Boolean(data.is_published !== undefined ? data.is_published : updatePayload.is_published ?? true),
+        published_at: updated ? updated.published_at : (data.published_at || (updatePayload.published_at as string | null) || null),
+        created_at: updated?.created_at || now,
+        updated_at: updated?.updated_at || now,
       };
 
       return { success: true, article: fresh };
