@@ -20,8 +20,6 @@ import {
   Layers,
   CheckCircle2,
   ToggleRight,
-  Eye,
-  EyeOff,
   AlertTriangle,
   Loader2,
   Compass,
@@ -51,17 +49,6 @@ const PAGE_ICONS: Record<string, React.ElementType> = {
   'inclusivity': HeartHandshake,
   'about': Compass,
   'article': BookOpen,
-};
-
-const PAGE_DESCRIPTIONS: Record<string, string> = {
-  'project': 'Cinema pipeline, active narrative film productions & sound archives',
-  'portfolio': 'Curated tactile visual showcase, publications & spatial pavilions',
-  'being-creative': '10 foundational creative tenets & dual-perspective analysis',
-  'infra-team': 'Collaborative collective of directors, artisans & creative technologists',
-  'ai-ethics': 'Human authorship charter, copyright integrity & ethical AI commitments',
-  'inclusivity': 'Universal sensory accessibility, diverse voices & neurodivergent design',
-  'about': 'Origins story, studio vision & multidisciplinary atelier philosophy',
-  'article': 'Editorial essays, studio methodology & published workshop lectures',
 };
 
 export const AdminDashboardPage: React.FC = () => {
@@ -333,7 +320,7 @@ export const AdminDashboardPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-x-hidden text-[#381E0A]">
+    <div className="h-screen w-screen flex flex-col overflow-hidden bg-[#FAF3E6] text-[#381E0A] relative">
       <ForestBackdrop />
 
       {/* Floating Status Toast */}
@@ -393,162 +380,146 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Admin Top Header (Sticky Top) */}
-      <header className="sticky top-0 z-30 w-full px-3 sm:px-6 pt-3">
-        <div className="max-w-[1240px] mx-auto game-wood-plank px-3 sm:px-6 py-2.5 flex items-center justify-between shadow-[0_4px_0_#2B1302]">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-b from-[#FFF8EC] to-[#EADBBD] border border-[#4A2306] text-[#8B5226] flex items-center justify-center font-bold shadow-xs shrink-0">
-              {React.createElement(getTabIcon(activeTab), { className: 'w-5 h-5 text-[#8B5226]' })}
+      {/* Admin Top Header (Fixed at top of screen) */}
+      <header className="fixed top-0 left-0 right-0 w-full z-30 h-14 sm:h-16 game-wood-header-strip px-4 sm:px-6 flex items-center justify-between shadow-[0_4px_0_#2B1302]">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-b from-[#FFF8EC] to-[#EADBBD] border border-[#4A2306] text-[#8B5226] flex items-center justify-center font-bold shadow-xs shrink-0">
+            {React.createElement(getTabIcon(activeTab), { className: 'w-5 h-5 text-[#8B5226]' })}
+          </div>
+          <div className="min-w-0">
+            <div className="game-text-title text-sm sm:text-lg leading-tight truncate">
+              {getTabDisplayName(activeTab)}
             </div>
-            <div className="min-w-0">
-              <div className="game-text-title text-sm sm:text-lg leading-tight truncate">
-                {getTabDisplayName(activeTab)}
-              </div>
-              <div className="text-[11px] text-[#FFE8C2] font-semibold mt-0.5 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)] truncate">
-                Administrator: {currentUser?.email || 'admin@imaginiv.site'}
-              </div>
+            <div className="text-[11px] text-[#FFE8C2] font-semibold mt-0.5 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)] truncate">
+              Administrator: {currentUser?.email || 'admin@imaginiv.site'}
             </div>
           </div>
-
-          {/* Tombol Menu Mobile: Tersembunyi di PC (>= 1024px), hanya tampil di mobile (< 1024px) */}
-          <button
-            type="button"
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="admin-mobile-menu-btn lg:!hidden game-btn-wood !w-9 !h-9 !p-0 items-center justify-center cursor-pointer shrink-0 shadow-[0_3px_0_#2A1202]"
-            aria-label="Buka menu navigasi"
-            title="Menu Navigasi"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
         </div>
+
+        {/* Tombol Menu Mobile: Tersembunyi di PC (>= 1024px), hanya tampil di mobile (< 1024px) */}
+        <button
+          type="button"
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="admin-mobile-menu-btn lg:!hidden game-btn-wood !w-9 !h-9 !p-0 items-center justify-center cursor-pointer shrink-0 shadow-[0_3px_0_#2A1202]"
+          aria-label="Buka menu navigasi"
+          title="Menu Navigasi"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
       </header>
 
-      {/* Main Admin Content Container */}
-      <main className="flex-1 w-full max-w-[1240px] mx-auto px-3 sm:px-6 py-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-          {/* Desktop Fixed/Sticky Sidebar Tabs (always visible on PC/tablet and fixed while scrolling) */}
-          <aside className="hidden lg:block lg:col-span-1 sticky top-[76px] self-start max-h-[calc(100vh-90px)] overflow-y-auto pr-1">
-            <div className="game-wood-frame p-3 sm:p-4 relative">
-              {renderSidebarContent()}
-            </div>
-          </aside>
+      {/* Main Dashboard Layout (Full available viewport below fixed header) */}
+      <div className="w-full flex-1 mt-14 sm:mt-16 flex overflow-hidden relative z-10">
+        {/* Desktop Sidebar (full vertical height below header, independently scrollable) */}
+        <aside className="hidden lg:flex flex-col w-64 xl:w-72 shrink-0 h-full border-r-2 border-[#542B0D] bg-[#7E481D] overflow-y-auto p-3 sm:p-4 shadow-[4px_0_12px_rgba(0,0,0,0.15)] z-20">
+          {renderSidebarContent()}
+        </aside>
 
-          {/* CMS Sector Workspace */}
-          <section className="lg:col-span-3">
-            <div className="game-wood-frame p-4 sm:p-6 relative min-h-[460px] flex flex-col justify-between">
-              <div className="game-parchment p-5 sm:p-7 rounded-xl flex-1 flex flex-col justify-between">
-                <div>
-                  {/* TAB 1: PAGE VISIBILITY CONTROL CENTER */}
-                  {activeTab === 'visibility' && (
-                    <div className="my-6 space-y-4">
-                      {/* Notice Banner */}
-                      <div className="p-4 bg-gradient-to-r from-[#FFF8EC] to-[#FCEECC] rounded-xl border border-[#D6BC90] flex items-start gap-3">
-                        <Info className="w-5 h-5 text-[#E8863A] shrink-0 mt-0.5" />
-                        <div className="text-xs sm:text-sm text-[#5E3A1A] leading-relaxed font-semibold">
-                          Toggling a page switch immediately updates the database. Deactivated pages disappear from the Navbar and Directory for <strong>ALL visitors</strong>, and direct URLs display a stylized "Page Unavailable" notice instead of a 404 error.
-                        </div>
-                      </div>
-
-                      {/* Pages List */}
-                      {pagesLoading ? (
-                        <div className="py-12 text-center space-y-3 animate-pulse">
-                          <Loader2 className="w-8 h-8 text-[#2F8FE0] animate-spin mx-auto" />
-                          <div className="text-sm font-bold text-[#7C471E]">Loading page visibility records...</div>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {pages.map((page) => {
-                            const IconComponent = PAGE_ICONS[page.id] || Compass;
-                            const description = PAGE_DESCRIPTIONS[page.id] || 'Village sector destination';
-
-                            return (
-                              <div
-                                key={page.id}
-                                className={`p-4 sm:p-5 rounded-2xl border-2 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                                  page.is_visible
-                                    ? 'bg-white border-[#D6BC90] shadow-sm'
-                                    : 'bg-[#F2E5CE]/70 border-[#D1B78E] opacity-85'
-                                }`}
-                              >
-                                {/* Left Info */}
-                                <div className="flex items-start sm:items-center gap-3.5 min-w-0">
-                                  {/* Icon */}
-                                  <div
-                                    className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border shadow-xs ${
-                                      page.is_visible
-                                        ? 'bg-gradient-to-b from-[#FFF8EC] to-[#F5E2B8] border-[#CBB38B] text-[#8B5226]'
-                                        : 'bg-[#E5D2AB] border-[#C0A87A] text-[#8C6B4E]'
-                                    }`}
-                                  >
-                                    <IconComponent className="w-6 h-6" strokeWidth={2.2} />
-                                  </div>
-
-                                  {/* Text */}
-                                  <div className="min-w-0">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                      <h3 className="font-display text-lg text-[#381E0A]">
-                                        {page.label}
-                                      </h3>
-                                      <span className="text-[11px] font-mono font-bold text-[#8B5226] bg-[#F2E4C8] px-2 py-0.5 rounded-md border border-[#DEC9A3]">
-                                        {page.route || `/${page.id}`}
-                                      </span>
-                                      {page.is_visible ? (
-                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#2A7513] bg-[#EAF7E2] px-2 py-0.5 rounded-full border border-[#BCE4AA]">
-                                          <Eye className="w-3 h-3" />
-                                          <span>Visible to Visitors</span>
-                                        </span>
-                                      ) : (
-                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#9C3811] bg-[#FDF0E9] px-2 py-0.5 rounded-full border border-[#F5C7B0]">
-                                          <EyeOff className="w-3 h-3" />
-                                          <span>Resting (Hidden)</span>
-                                        </span>
-                                      )}
-                                    </div>
-                                    <p className="text-xs text-[#5C3210] font-semibold mt-1">
-                                      {description}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                {/* Right: Game 3D Toggle Switch */}
-                                <div className="flex items-center justify-end shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#E8D8B8]">
-                                  <button
-                                    type="button"
-                                    role="switch"
-                                    aria-checked={page.is_visible}
-                                    aria-label={`Toggle visibility for ${page.label}`}
-                                    onClick={() => handleToggleVisibility(page.id, page.is_visible)}
-                                    className={`
-                                      group relative inline-flex items-center w-20 sm:w-24 h-9 sm:h-10 rounded-full cursor-pointer select-none transition-colors duration-200 ease-in-out border-3 border-[#4A2306] shadow-[0_4px_0_#2B1302,inset_0_2px_4px_rgba(0,0,0,0.4)]
-                                      ${page.is_visible
-                                        ? 'bg-gradient-to-r from-[#62C922] to-[#45A311]'
-                                        : 'bg-gradient-to-r from-[#8C5D35] to-[#633917]'}
-                                    `}
-                                  >
-                                    {/* Background text indicator */}
-                                    <span className={`text-[10px] font-black uppercase tracking-wider absolute transition-opacity duration-150 ${page.is_visible ? 'left-2.5 text-white opacity-95' : 'right-2.5 text-[#EAD0A8] opacity-80'}`}>
-                                      {page.is_visible ? 'ON' : 'OFF'}
-                                    </span>
-
-                                    {/* 3D Sliding Glossy Knob */}
-                                    <span
-                                      className={`
-                                        pointer-events-none inline-block w-7 sm:w-8 h-7 sm:h-8 rounded-full bg-gradient-to-b from-[#FFFFFF] via-[#FDF5E6] to-[#E2CEAB] border-2 border-[#542E10] shadow-[0_3px_0_#2E1303,0_4px_8px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.9)] transform transition-transform duration-200 ease-out
-                                        ${page.is_visible ? 'translate-x-11 sm:translate-x-14' : 'translate-x-1'}
-                                      `}
-                                    >
-                                      {/* Mini center gold rivet */}
-                                      <span className="block w-2 h-2 rounded-full bg-[#D4A346] border border-[#754E15] mx-auto mt-2" />
-                                    </span>
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
+        {/* Main Admin Workspace (uses remaining width, full height, independently scrollable, no restrictive outer wooden frame) */}
+        <main className="flex-1 h-full overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#FAF3E6] min-w-0 flex flex-col justify-between">
+          <div>
+            {/* TAB 1: PAGE VISIBILITY CONTROL CENTER - COCKPIT STYLE */}
+            {activeTab === 'visibility' && (
+              <div className="my-4 sm:my-6 space-y-4">
+                {/* Notice & Cockpit Status Banner */}
+                <div className="p-3.5 sm:p-4 bg-gradient-to-r from-[#FFF8EC] to-[#FCEECC] rounded-xl border border-[#D6BC90] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-start gap-2.5">
+                    <Info className="w-4 h-4 sm:w-5 sm:h-5 text-[#E8863A] shrink-0 mt-0.5" />
+                    <div className="text-xs sm:text-sm text-[#5E3A1A] leading-relaxed font-semibold">
+                      Toggling a switch immediately updates the database. Deactivated sectors disappear from the Navbar & Directory for <strong>ALL visitors</strong>.
                     </div>
-                  )}
+                  </div>
+                  <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 text-xs font-mono font-bold text-[#381E0A] bg-[#FFFBF2] px-2.5 py-1 rounded-lg border border-[#D6BC90] shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-[#46B814] animate-pulse" />
+                    <span>{activePagesCount} / {pages.length} ONLINE</span>
+                  </div>
+                </div>
+
+                {/* Cockpit Control Grid */}
+                {pagesLoading ? (
+                  <div className="py-12 text-center space-y-3 animate-pulse">
+                    <Loader2 className="w-8 h-8 text-[#2F8FE0] animate-spin mx-auto" />
+                    <div className="text-sm font-bold text-[#7C471E]">Loading cockpit control modules...</div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                    {pages.map((page) => {
+                      const IconComponent = PAGE_ICONS[page.id] || Compass;
+                      const route = page.route || (page.id === 'infra-team' ? '/theimaginers' : page.id === 'being-creative' ? '/beingcreative' : `/${page.id.replace(/-/g, '')}`);
+
+                      return (
+                        <div
+                          key={page.id}
+                          className={`relative rounded-xl border-2 p-3 flex items-center justify-between gap-3 transition-all select-none ${
+                            page.is_visible
+                              ? 'bg-[#FFFDF7] border-[#4A2408] shadow-[0_2px_0_#4A2408]'
+                              : 'bg-[#F3E7D3]/85 border-[#A88665] opacity-75 shadow-xs'
+                          }`}
+                        >
+                          {/* Left: Small Icon + Page Name + Route */}
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
+                                page.is_visible
+                                  ? 'bg-[#FFF8EC] border-[#CBB38B] text-[#7A3F14] shadow-xs'
+                                  : 'bg-[#E5D2AB] border-[#C0A87A] text-[#8C6B4E]'
+                              }`}
+                            >
+                              <IconComponent className="w-4 h-4" strokeWidth={2.2} />
+                            </div>
+
+                            <div className="min-w-0">
+                              <div className="font-display text-sm text-[#381E0A] truncate leading-tight">
+                                {page.label}
+                              </div>
+                              <div className="text-[11px] font-mono font-semibold text-[#8B5226] truncate leading-tight mt-0.5">
+                                {route}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right: Physical Cockpit Toggle Switch */}
+                          <button
+                            type="button"
+                            role="switch"
+                            aria-checked={page.is_visible}
+                            aria-label={`Toggle visibility for ${page.label}`}
+                            onClick={() => handleToggleVisibility(page.id, page.is_visible)}
+                            className={`group relative inline-flex items-center h-7 w-14 rounded-lg p-0.5 cursor-pointer select-none transition-all duration-200 border-2 shrink-0 ${
+                              page.is_visible
+                                ? 'bg-[#2E7D17] border-[#184809] shadow-[inset_0_1px_3px_rgba(0,0,0,0.5),0_1px_0_rgba(255,255,255,0.4)]'
+                                : 'bg-[#5C3A21] border-[#381F0E] shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)]'
+                            }`}
+                          >
+                            {/* Cockpit ON/OFF text label */}
+                            <span
+                              className={`text-[9px] font-mono font-black tracking-wider uppercase absolute transition-opacity duration-150 ${
+                                page.is_visible ? 'left-1.5 text-[#E6FFCC]' : 'right-1.5 text-[#D4B598]'
+                              }`}
+                            >
+                              {page.is_visible ? 'ON' : 'OFF'}
+                            </span>
+
+                            {/* Cockpit Toggle Rocker Knob */}
+                            <span
+                              className={`inline-block w-5 h-5 rounded-md bg-gradient-to-b from-[#FFFDF7] to-[#D9C4A1] border border-[#4A2408] shadow-[0_2px_0_#2B1302,0_2px_4px_rgba(0,0,0,0.25)] transform transition-transform duration-200 ease-out ${
+                                page.is_visible ? 'translate-x-7' : 'translate-x-0'
+                              }`}
+                            >
+                              {/* Tactile micro grip stripes */}
+                              <span className="flex flex-col items-center justify-center h-full gap-0.5 pointer-events-none">
+                                <span className="w-2.5 h-[1.5px] bg-[#8C5D35] rounded-full" />
+                                <span className="w-2.5 h-[1.5px] bg-[#8C5D35] rounded-full" />
+                              </span>
+                            </span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
                   {/* TAB 2: HERO BANNER CAROUSEL MANAGEMENT */}
                   {activeTab === 'banners' && (
@@ -593,21 +564,18 @@ export const AdminDashboardPage: React.FC = () => {
                       </button>
                     </div>
                   )}
-                </div>
+          </div>
 
-                <div className="pt-4 border-t-2 border-[#D6BC90] flex flex-col sm:flex-row items-center justify-between text-xs font-bold text-[#7C471E] gap-2">
-                  <span>Imaginiv Atelier CMS &bull; Page Visibility Engine</span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#381E0A]">Active: {activePagesCount} / {pages.length}</span>
-                    <span className="text-[#A8642E]">&bull;</span>
-                    <span>Admin Gate Protected</span>
-                  </div>
-                </div>
-              </div>
+          <div className="mt-8 pt-4 border-t-2 border-[#D6BC90] flex flex-col sm:flex-row items-center justify-between text-xs font-bold text-[#7C471E] gap-2">
+            <span>Imaginiv Atelier CMS &bull; Page Visibility Engine</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[#381E0A]">Active: {activePagesCount} / {pages.length}</span>
+              <span className="text-[#A8642E]">&bull;</span>
+              <span>Admin Gate Protected</span>
             </div>
-          </section>
-        </div>
-      </main>
+          </div>
+        </main>
+      </div>
 
       {/* Safety Warning Modal (Prevents deactivating all pages) */}
       {safetyWarningOpen && (

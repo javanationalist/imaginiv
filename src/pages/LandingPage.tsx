@@ -370,25 +370,18 @@ export const LandingPage: React.FC = () => {
         </div>
       </div>
 
-      <main className="flex-1 w-full max-w-[1240px] mx-auto px-3 sm:px-6 relative z-10">
+      <main className="flex-1 w-full max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
 
         {/* 3. DIRECTORY (id="directory")
-            Styled as the Village Map Board:
-            - Grand wood board
+            Clean full-viewport Directory without restrictive outer wooden frame:
             - Header wooden plank "DIRECTORY"
             - Real-time search bar
-            - 7 Destination Cards
+            - 7 Destination Bento Cards
         */}
-        <section id="directory" ref={directorySectionRef} className="pt-6 pb-20 scroll-mt-20">
-          <div className="game-wood-frame p-4 sm:p-7 relative">
-            {/* Corner Nails on Board */}
-            <div className="absolute top-3 left-3 game-nail !w-3.5 !h-3.5" />
-            <div className="absolute top-3 right-3 game-nail !w-3.5 !h-3.5" />
-
+        <section id="directory" ref={directorySectionRef} className="pt-4 pb-20 scroll-mt-20">
+          <div className="w-full relative">
             {/* Top Plank Banner */}
-            <div className="game-wood-plank -mt-8 sm:-mt-11 mx-auto max-w-sm sm:max-w-md py-2 px-6 text-center relative z-20 shadow-[0_5px_0_#2B1302]">
-              <div className="absolute top-2 left-3 game-nail" />
-              <div className="absolute top-2 right-3 game-nail" />
+            <div className="game-wood-plank mx-auto max-w-sm sm:max-w-md py-2.5 px-6 text-center relative z-20 shadow-[0_5px_0_#2B1302] mb-6">
               <h2
                 className="font-display text-xl sm:text-2xl uppercase tracking-wider text-white"
                 style={{
@@ -401,7 +394,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Header & Search on Parchment */}
-            <div className="mt-4 mb-6 flex flex-col md:flex-row md:items-center justify-end gap-4">
+            <div className="mb-6 flex flex-col md:flex-row md:items-center justify-end gap-4">
               {/* Real-time Search Input on Parchment */}
               <div className="w-full md:w-80 relative">
                 <label htmlFor="directory-search-input" className="sr-only">

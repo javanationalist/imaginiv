@@ -13,7 +13,7 @@ import {
   ArrowRight, 
   FileText
 } from 'lucide-react';
-import { PageShell } from '../components/common/PageShell';
+import { ArticleShell } from '../components/article/ArticleShell';
 import { PageTitle } from '../components/common/PageTitle';
 import { ArticleItem } from '../types';
 import { articlesService } from '../services/articlesService';
@@ -80,7 +80,7 @@ export const ArticleListPage: React.FC = () => {
   };
 
   return (
-    <PageShell>
+    <ArticleShell className="px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8">
       {/* 1. Page Header Plaque (Plank hidden per user request) */}
       <PageTitle
         title="Article"
@@ -128,7 +128,7 @@ export const ArticleListPage: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredArticles.map((article) => {
             const hasCover = Boolean(article.cover_image_url);
 
@@ -199,6 +199,6 @@ export const ArticleListPage: React.FC = () => {
           })}
         </div>
       )}
-    </PageShell>
+    </ArticleShell>
   );
 };

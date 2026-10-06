@@ -124,15 +124,10 @@ export const LoginPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Main Login Card in Game Wood Frame */}
-      <div className="w-full max-w-md game-wood-frame p-4 sm:p-6 relative z-10">
-        <div className="absolute top-2.5 left-2.5 game-nail !w-3 !h-3" />
-        <div className="absolute top-2.5 right-2.5 game-nail !w-3 !h-3" />
-        <div className="absolute bottom-2.5 left-2.5 game-nail !w-3 !h-3" />
-        <div className="absolute bottom-2.5 right-2.5 game-nail !w-3 !h-3" />
-
+      {/* Main Login Card without heavy outer wooden frame */}
+      <div className="w-full max-w-md relative z-10">
         {/* Top Plaque Header */}
-        <div className="game-wood-plank -mt-7 sm:-mt-9 mx-auto max-w-xs py-2 px-4 text-center shadow-[0_4px_0_#2B1302]">
+        <div className="game-wood-plank mx-auto max-w-xs py-2 px-4 text-center shadow-[0_4px_0_#2B1302] mb-3">
           <h1
             className="font-display text-xl sm:text-2xl uppercase tracking-wider text-white border-none outline-none"
             style={{
@@ -147,7 +142,7 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Parchment Body */}
-        <div className="game-parchment p-6 sm:p-7 rounded-2xl mt-4">
+        <div className="game-parchment p-6 sm:p-8 rounded-2xl shadow-xl border-2 border-[#542E10]">
           <div className="text-center mb-5">
             <h2 className="font-display text-2xl font-bold text-[#381E0A]">
               Login

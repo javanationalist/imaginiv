@@ -52,27 +52,21 @@ export const PageShell: React.FC<PageShellProps> = ({
       {/* 2. Global Unified Wood Navbar */}
       <Header />
 
-      {/* 3. Main Page Container: Grand Wood Pop-Up Frame with Parchment Paper */}
-      <main className={`flex-1 w-full max-w-[1240px] mx-auto px-3 sm:px-6 py-4 sm:py-6 relative z-10 ${className}`}>
-        {/* Navigation / Breadcrumb Bar moved ABOVE the content shape */}
+      {/* 3. Main Page Container: Full available viewport without restrictive outer wooden frame */}
+      <main className={`flex-1 w-full max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 relative z-10 ${className}`}>
+        {/* Navigation / Breadcrumb Bar moved ABOVE the content */}
         {renderedTopBar && (
           <div className="mb-3 sm:mb-4 w-full">
             {renderedTopBar}
           </div>
         )}
 
-        <div className="game-wood-frame p-3 sm:p-5 lg:p-6 relative">
-          {/* Corner Nails on Main Board */}
-          <div className="absolute top-3 left-3 game-nail !w-3.5 !h-3.5" />
-          <div className="absolute top-3 right-3 game-nail !w-3.5 !h-3.5" />
-
-          {/* Parchment Paper Container holding the page content */}
-          <div 
-            className={`game-parchment p-5 sm:p-8 lg:p-10 rounded-2xl relative ${parchmentClassName}`}
-            style={parchmentStyle}
-          >
-            {mainChildren}
-          </div>
+        {/* Parchment Paper Container holding the page content without outer wooden frame */}
+        <div 
+          className={`game-parchment p-5 sm:p-8 lg:p-10 rounded-2xl relative shadow-md ${parchmentClassName}`}
+          style={parchmentStyle}
+        >
+          {mainChildren}
         </div>
       </main>
 

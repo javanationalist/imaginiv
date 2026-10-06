@@ -13,7 +13,7 @@ import {
   Check, 
   AlertCircle
 } from 'lucide-react';
-import { PageShell } from '../components/common/PageShell';
+import { ArticleShell } from '../components/article/ArticleShell';
 import { ArticleItem } from '../types';
 import { articlesService } from '../services/articlesService';
 import { authService } from '../services/authService';
@@ -108,19 +108,18 @@ export const ArticleDetailPage: React.FC = () => {
   // 1. SKELETON LOADING STATE
   if (loading) {
     return (
-      <PageShell
-        parchmentClassName="!bg-[#FEFAF7] !bg-none"
-        parchmentStyle={{ backgroundColor: '#FEFAF7', backgroundImage: 'none' }}
-      >
-        <ArticleDetailSkeleton />
-      </PageShell>
+      <ArticleShell className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="max-w-4xl xl:max-w-5xl mx-auto w-full">
+          <ArticleDetailSkeleton />
+        </div>
+      </ArticleShell>
     );
   }
 
   // 2. NOT FOUND BEHAVIOR (Friendly Stylized Wood Panel)
   if (!article) {
     return (
-      <PageShell>
+      <ArticleShell className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="py-12 sm:py-16 text-center max-w-xl mx-auto space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-[#FFF5E0] to-[#EADBBD] border-2 border-[#542E10] flex items-center justify-center text-[#8B5226] mx-auto shadow-md">
             <AlertCircle className="w-8 h-8 text-[#C62828]" />
@@ -143,20 +142,18 @@ export const ArticleDetailPage: React.FC = () => {
             </Link>
           </div>
         </div>
-      </PageShell>
+      </ArticleShell>
     );
   }
 
   // 3. ARTICLE DETAIL DISPLAY
   return (
-    <PageShell
-      parchmentClassName="!bg-[#FEFAF7] !bg-none"
-      parchmentStyle={{ backgroundColor: '#FEFAF7', backgroundImage: 'none' }}
-    >
+    <ArticleShell className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       {/* Subtle Stylized Reading Progress Bar */}
       <ArticleReadingProgressBar targetSelector="#article-manuscript" />
 
-      {/* Top Back Navigation Bar */}
+      <div className="max-w-4xl xl:max-w-5xl mx-auto w-full">
+        {/* Top Back Navigation Bar */}
       <div className="flex items-center justify-between gap-2 sm:gap-4 pb-4 sm:pb-6 border-b-2 border-[#D6BC90] mb-6 sm:mb-8 w-full">
         <Link
           to="/article"
@@ -261,6 +258,7 @@ export const ArticleDetailPage: React.FC = () => {
           </Link>
         </div>
       </article>
-    </PageShell>
-  );
+    </div>
+  </ArticleShell>
+);
 };

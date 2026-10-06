@@ -13,21 +13,16 @@ export const NotFoundPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center relative overflow-x-hidden px-4 py-12">
       <ForestBackdrop />
 
-      <div className="w-full max-w-lg game-wood-frame p-4 sm:p-6 relative z-10 text-center">
-        <div className="absolute top-2.5 left-2.5 game-nail !w-3 !h-3" />
-        <div className="absolute top-2.5 right-2.5 game-nail !w-3 !h-3" />
-        <div className="absolute bottom-2.5 left-2.5 game-nail !w-3 !h-3" />
-        <div className="absolute bottom-2.5 right-2.5 game-nail !w-3 !h-3" />
-
+      <div className="w-full max-w-lg relative z-10 text-center">
         {/* Top Plaque Header */}
-        <div className="game-wood-plank -mt-7 sm:-mt-9 mx-auto max-w-xs py-2 px-4 text-center shadow-[0_4px_0_#2B1302]">
+        <div className="game-wood-plank mx-auto max-w-xs py-2 px-4 text-center shadow-[0_4px_0_#2B1302] mb-3">
           <h1 className="game-text-title text-xl sm:text-2xl uppercase tracking-wider">
             Lost in Forest
           </h1>
         </div>
 
         {/* Parchment Body */}
-        <div className="game-parchment p-8 sm:p-10 rounded-2xl mt-4">
+        <div className="game-parchment p-8 sm:p-10 rounded-2xl shadow-xl border-2 border-[#542E10]">
           <div className="w-18 h-18 mx-auto rounded-2xl bg-gradient-to-b from-[#FFF8EC] to-[#EADBBD] border-2 border-[#5D2B03] flex items-center justify-center text-[#8B5226] mb-4 shadow-[0_3px_0_#3E1B02]">
             <MapPinOff className="w-9 h-9" strokeWidth={2.3} />
           </div>
