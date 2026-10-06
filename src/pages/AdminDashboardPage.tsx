@@ -291,21 +291,9 @@ export const AdminDashboardPage: React.FC = () => {
 
       {/* 4. Footer: Supabase Engine */}
       <div className="pt-3 border-t-2 border-[#D6BC90] text-[11px] text-[#7C471E] font-bold px-2 space-y-1.5">
-        <div className="flex items-center justify-between text-[#381E0A]">
-          <div className="flex items-center gap-1.5">
-            <Database className="w-3.5 h-3.5 text-[#2A7513]" />
-            <span>Supabase Engine</span>
-          </div>
-          <a
-            href="https://supabase.com/dashboard/project/yjrdbggomigcotijziqf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] text-[#1D7448] hover:text-[#0F472B] font-bold inline-flex items-center gap-1 hover:underline"
-            title="Open project dashboard in Supabase"
-          >
-            <span>Dashboard</span>
-            <ExternalLink className="w-2.5 h-2.5" />
-          </a>
+        <div className="flex items-center gap-1.5 text-[#381E0A]">
+          <Database className="w-3.5 h-3.5 text-[#2A7513]" />
+          <span>Supabase Engine</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured() ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
@@ -422,11 +410,11 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Tombol Menu Mobile: Hanya menampilkan ikon tanpa teks keterangan */}
+          {/* Tombol Menu Mobile: Tersembunyi di PC (>= 1024px), hanya tampil di mobile (< 1024px) */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(true)}
-            className="lg:hidden game-btn-wood !w-9 !h-9 !p-0 flex items-center justify-center cursor-pointer shrink-0 shadow-[0_3px_0_#2A1202]"
+            className="admin-mobile-menu-btn lg:!hidden game-btn-wood !w-9 !h-9 !p-0 items-center justify-center cursor-pointer shrink-0 shadow-[0_3px_0_#2A1202]"
             aria-label="Buka menu navigasi"
             title="Menu Navigasi"
           >

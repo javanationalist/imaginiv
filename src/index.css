@@ -328,6 +328,18 @@
     0 3px 6px rgba(30, 12, 3, 0.25);
 }
 
+/* Responsive Admin Mobile Menu Button: strictly hidden on PC/Desktop, visible only on mobile */
+@media (min-width: 1024px) {
+  .admin-mobile-menu-btn {
+    display: none !important;
+  }
+}
+@media (max-width: 1023px) {
+  .admin-mobile-menu-btn {
+    display: flex !important;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    GAME UI: CARTOON TYPOGRAPHY & TEXT STROKES
    ═══════════════════════════════════════════════════════════════ */
