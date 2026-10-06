@@ -193,8 +193,7 @@ export const ArticleDetailPage: React.FC = () => {
       {/* Main Article Document */}
       <article
         id="article-manuscript"
-        className="max-w-4xl mx-auto bg-[#FEFAF7]"
-        style={{ backgroundColor: '#FEFAF7' }}
+        className="max-w-4xl mx-auto"
       >
         <div className="space-y-3 mb-6">
           <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl text-[#381E0A] leading-tight">
@@ -240,7 +239,7 @@ export const ArticleDetailPage: React.FC = () => {
         )}
 
         {/* Rendered Article Markdown Content */}
-        <div className="w-full bg-[#FEFAF7]" style={{ backgroundColor: '#FEFAF7' }}>
+        <div className="w-full">
           <MarkdownContent content={article.content} />
         </div>
 
