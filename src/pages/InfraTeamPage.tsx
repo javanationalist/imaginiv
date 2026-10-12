@@ -10,6 +10,8 @@ import { PageShell } from '../components/common/PageShell';
 import { ImaginersPageData, ImaginersMember } from '../types';
 import { imaginersService } from '../services/imaginersService';
 import { SocialIcon, formatSocialHref } from '../components/imaginers/SocialIcon';
+import { MemberDetailModal } from '../components/imaginers/MemberDetailModal';
+import { soundManager } from '../services/soundService';
 import { scheduleCartoonPop } from '../utils/soundEffects';
 
 export const InfraTeamPage: React.FC = () => {
@@ -19,6 +21,23 @@ export const InfraTeamPage: React.FC = () => {
   });
   const [members, setMembers] = useState<ImaginersMember[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Selected member for Landscape Detail Modal
+  const [selectedMember, setSelectedMember] = useState<ImaginersMember | null>(null);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handleOpenMemberModal = (member: ImaginersMember) => {
+    soundManager.playClick();
+    setSelectedMember(member);
+  };
+
+  const handleCloseMemberModal = () => {
+    const memberId = selectedMember?.id;
+    setSelectedMember(null);
+    if (memberId && cardRefs.current[memberId]) {
+      cardRefs.current[memberId]?.focus();
+    }
+  };
 
   // Trigger playful cartoon pop sound once on initial entrance animation
   const hasPlayedEntranceSoundRef = useRef(false);
@@ -169,8 +188,20 @@ export const InfraTeamPage: React.FC = () => {
               return (
                 <div
                   key={member.id}
+                  ref={(el) => { cardRefs.current[member.id] = el; }}
+                  role="button"
+                  tabIndex={0}
+                  aria-haspopup="dialog"
+                  aria-label={`Lihat profil detail ${member.name || member.role}`}
+                  onClick={() => handleOpenMemberModal(member)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleOpenMemberModal(member);
+                    }
+                  }}
                   style={{ animationDelay: `${index * 0.12}s` }}
-                  className={`cartoon-bounce-in game-wood-frame p-3.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl w-full max-w-sm ${
+                  className={`cartoon-bounce-in game-wood-frame p-3.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl w-full max-w-sm cursor-pointer select-none focus:outline-none focus:ring-4 focus:ring-[#2F8FE0]/60 ${
                     isLastOdd ? 'md:col-span-2 justify-self-center mx-auto' : ''
                   }`}
                 >
@@ -226,6 +257,10 @@ export const InfraTeamPage: React.FC = () => {
                               href={href}
                               target={isEmail ? undefined : '_blank'}
                               rel={isEmail ? undefined : 'noopener noreferrer'}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                soundManager.playClick();
+                              }}
                               aria-label={`${member.name || member.role} on ${s.platform}`}
                               title={s.platform}
                               className="w-8 h-8 rounded-lg bg-[#FAF0D4] hover:bg-[#2F8FE0] text-[#542E10] hover:text-white border-2 border-[#542E10] shadow-[0_2px_0_#2B1302] flex items-center justify-center transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-0.5 cursor-pointer"
@@ -236,6 +271,14 @@ export const InfraTeamPage: React.FC = () => {
                         })}
                       </div>
                     )}
+
+                    {/* 5. Prompt indicator to view full profile modal */}
+                    <div className="pt-1.5 w-full flex items-center justify-center">
+                      <span className="text-[11px] font-display font-bold text-[#146FBF] group-hover:text-[#093764] group-hover:underline inline-flex items-center gap-1 transition-colors">
+                        <span>Lihat Profil</span>
+                        <span aria-hidden="true">&rarr;</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               );
@@ -243,6 +286,12 @@ export const InfraTeamPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* 4. Landscape Member Profile Detail Modal with Typewriter Animation */}
+      <MemberDetailModal
+        member={selectedMember}
+        onClose={handleCloseMemberModal}
+      />
     </PageShell>
   );
 };
