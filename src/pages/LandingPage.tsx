@@ -16,6 +16,7 @@ import { Footer } from '../components/common/Footer';
 import { BentoDirectoryCard, BentoCardData } from '../components/ui/BentoDirectoryCard';
 import { ForestBackdrop } from '../components/common/VillageArtwork';
 import { BannerSection } from '../components/ui/BannerSection';
+import { LatestArticlesSection } from '../components/articles/LatestArticlesSection';
 import { usePageVisibility } from '../context/PageVisibilityContext';
 import { scheduleCartoonPop } from '../utils/soundEffects';
 
@@ -30,6 +31,7 @@ export const LandingPage: React.FC = () => {
   >({});
   const directorySectionRef = useRef<HTMLElement | null>(null);
   const heroAreaRef = useRef<HTMLDivElement | null>(null);
+  const articlesAreaRef = useRef<HTMLDivElement | null>(null);
   const cardElementsRef = useRef<Map<string, HTMLElement>>(new Map());
 
   // Persistent flag: true while #directory is the active navigation target
@@ -100,34 +102,42 @@ export const LandingPage: React.FC = () => {
     }
   }, [loading, isDirectoryTarget, scrollToDirectory]);
 
-  // 4. ResizeObserver: Recalculate #directory position if banner/hero height shifts
+  // 4. ResizeObserver: Recalculate #directory position if banner or articles height shifts
   useEffect(() => {
-    if (!isDirectoryTarget) return;
+    if (!isDirectoryTarget || typeof ResizeObserver === 'undefined') return;
 
-    const heroEl = heroAreaRef.current;
-    if (!heroEl || typeof ResizeObserver === 'undefined') return;
+    const observedElements = [heroAreaRef.current, articlesAreaRef.current].filter(
+      (el): el is HTMLDivElement => Boolean(el)
+    );
+    if (observedElements.length === 0) return;
 
-    let lastHeight = heroEl.offsetHeight;
+    const lastHeights = new Map<Element, number>();
+    observedElements.forEach((el) => lastHeights.set(el, el.offsetHeight));
 
     const ro = new ResizeObserver((entries) => {
       if (!pendingDirectoryScrollRef.current) return;
+      let shifted = false;
       for (const entry of entries) {
+        const prevHeight = lastHeights.get(entry.target) ?? 0;
         const newHeight = entry.contentRect.height;
-        if (Math.abs(newHeight - lastHeight) > 8) {
-          lastHeight = newHeight;
-          requestAnimationFrame(() => {
-            scrollToDirectory('smooth');
-          });
+        if (Math.abs(newHeight - prevHeight) > 8) {
+          lastHeights.set(entry.target, newHeight);
+          shifted = true;
         }
+      }
+      if (shifted) {
+        requestAnimationFrame(() => {
+          scrollToDirectory('smooth');
+        });
       }
     });
 
-    ro.observe(heroEl);
+    observedElements.forEach((el) => ro.observe(el));
 
     return () => {
       ro.disconnect();
     };
-  }, [isDirectoryTarget, scrollToDirectory]);
+  }, [isDirectoryTarget, scrollToDirectory, isPageVisible]);
 
   // The 7 official directory items matching exact site map & naming rule
   const directoryItems: BentoCardData[] = [
@@ -371,6 +381,12 @@ export const LandingPage: React.FC = () => {
       </div>
 
       <main className="flex-1 w-full max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
+        {/* 2.5. LATEST ARTICLES EDITORIAL SECTION (Positioned directly below hero banner, before Directory) */}
+        {isPageVisible('article') && (
+          <div ref={articlesAreaRef}>
+            <LatestArticlesSection onLayoutChange={handleBannerLoaded} />
+          </div>
+        )}
 
         {/* 3. DIRECTORY (id="directory")
             Clean full-viewport Directory without restrictive outer wooden frame:

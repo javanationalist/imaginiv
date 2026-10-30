@@ -10,6 +10,110 @@ import { ArticleInlineImageData, buildInlineImageStoragePath } from '../utils/ar
 export const MAX_COVER_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 export const ALLOWED_COVER_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+const PUBLISHED_CACHE_TTL_MS = 60_000;
+
+let publishedArticlesCache: { data: ArticleItem[]; fetchedAt: number } | null = null;
+let inFlightPublishedRequest: Promise<{ articles: ArticleItem[]; error: string | null }> | null = null;
+let realtimeSubscriptionCounter = 0;
+
+function mapArticleRow(row: Record<string, any>): ArticleItem {
+  return {
+    id: String(row.id),
+    title: String(row.title || ''),
+    slug: String(row.slug || ''),
+    category: typeof row.category === 'string' && row.category.trim() ? row.category.trim() : null,
+    excerpt: row.excerpt ?? null,
+    content: String(row.content || ''),
+    cover_image_url: row.cover_image_url ?? null,
+    cover_image_path: row.cover_image_path ?? null,
+    author: row.author ?? null,
+    is_published: Boolean(row.is_published),
+    published_at: row.published_at ?? null,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  };
+}
+
+function getPublicationTimestamp(article: ArticleItem): number {
+  const primary = article.published_at ? Date.parse(article.published_at) : NaN;
+  if (!Number.isNaN(primary)) return primary;
+
+  const fallback = article.created_at ? Date.parse(article.created_at) : NaN;
+  return Number.isNaN(fallback) ? 0 : fallback;
+}
+
+/**
+ * Strictly filters to published articles with valid slugs and sorts newest-first
+ * by publication date (`published_at`, falling back to `created_at`).
+ */
+export function sortPublishedArticles(articles: ArticleItem[]): ArticleItem[] {
+  return articles
+    .filter((item) => Boolean(item && item.is_published === true && item.slug?.trim() && item.title?.trim()))
+    .slice()
+    .sort((a, b) => getPublicationTimestamp(b) - getPublicationTimestamp(a));
+}
+
+function invalidatePublishedArticlesCache(): void {
+  publishedArticlesCache = null;
+}
+
+async function fetchPublishedArticlesInternal(
+  forceRefresh: boolean = false
+): Promise<{ articles: ArticleItem[]; error: string | null }> {
+  if (
+    !forceRefresh &&
+    publishedArticlesCache &&
+    Date.now() - publishedArticlesCache.fetchedAt < PUBLISHED_CACHE_TTL_MS
+  ) {
+    return { articles: publishedArticlesCache.data, error: null };
+  }
+
+  if (!forceRefresh && inFlightPublishedRequest) {
+    return inFlightPublishedRequest;
+  }
+
+  const client = getSupabaseClient();
+  if (!isSupabaseConfigured() || !client) {
+    console.warn('Supabase is not configured for published articles.');
+    return { articles: [], error: null };
+  }
+
+  const requestPromise = (async (): Promise<{ articles: ArticleItem[]; error: string | null }> => {
+    try {
+      const { data, error } = await client
+        .from('articles')
+        .select('*')
+        .eq('is_published', true)
+        .order('published_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Failed to fetch published articles from Supabase:', error.message);
+        return { articles: [], error: error.message || 'Unable to load published articles.' };
+      }
+
+      const mapped = Array.isArray(data) ? sortPublishedArticles(data.map(mapArticleRow)) : [];
+      publishedArticlesCache = {
+        data: mapped,
+        fetchedAt: Date.now(),
+      };
+      return { articles: mapped, error: null };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unable to load published articles.';
+      console.error('Exception fetching published articles from Supabase:', err);
+      return { articles: [], error: message };
+    } finally {
+      inFlightPublishedRequest = null;
+    }
+  })();
+
+  if (!forceRefresh) {
+    inFlightPublishedRequest = requestPromise;
+  }
+
+  return requestPromise;
+}
+
 export const articlesService = {
   /**
    * Generates a URL slug from a title string following exact specs:
@@ -55,48 +159,29 @@ export const articlesService = {
   },
 
   /**
-   * Fetch all published articles for public readers exclusively from Supabase.
+   * Fetch all published articles for public readers exclusively from Supabase,
+   * sorted newest-first by publication date (`published_at`, fallback `created_at`).
    * Never falls back to demo or mock articles or localStorage.
    */
-  async getPublishedArticles(): Promise<ArticleItem[]> {
-    const client = getSupabaseClient();
-    if (!isSupabaseConfigured() || !client) {
-      console.warn('Supabase is not configured for published articles.');
-      return [];
-    }
+  async getPublishedArticles(options?: { forceRefresh?: boolean }): Promise<ArticleItem[]> {
+    const { articles } = await fetchPublishedArticlesInternal(Boolean(options?.forceRefresh));
+    return articles;
+  },
 
-    try {
-      const { data, error } = await client
-        .from('articles')
-        .select('*')
-        .eq('is_published', true)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Failed to fetch published articles from Supabase:', error.message);
-        return [];
-      }
-
-      if (!data) return [];
-
-      return data.map((row) => ({
-        id: row.id,
-        title: row.title,
-        slug: row.slug,
-        excerpt: row.excerpt,
-        content: row.content,
-        cover_image_url: row.cover_image_url,
-        cover_image_path: row.cover_image_path,
-        author: row.author,
-        is_published: Boolean(row.is_published),
-        published_at: row.published_at,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-      }));
-    } catch (err) {
-      console.error('Exception fetching published articles from Supabase:', err);
-      return [];
-    }
+  /**
+   * Fetch up to `limit` newest published articles for editorial feeds (e.g., Landing Page)
+   * while surfacing network/query errors separately from genuine empty results.
+   */
+  async getLatestPublishedArticles(
+    limit: number = 6,
+    options?: { forceRefresh?: boolean }
+  ): Promise<{ articles: ArticleItem[]; error: string | null }> {
+    const safeLimit = Math.max(1, Math.min(limit, 6));
+    const { articles, error } = await fetchPublishedArticlesInternal(Boolean(options?.forceRefresh));
+    return {
+      articles: articles.slice(0, safeLimit),
+      error,
+    };
   },
 
   /**
@@ -393,6 +478,7 @@ export const articlesService = {
         updated_at: inserted?.updated_at || now,
       };
 
+      invalidatePublishedArticlesCache();
       return { success: true, article: newArticle };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to create article';
@@ -490,6 +576,7 @@ export const articlesService = {
         updated_at: updated?.updated_at || now,
       };
 
+      invalidatePublishedArticlesCache();
       return { success: true, article: fresh };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to update article';
@@ -515,6 +602,7 @@ export const articlesService = {
         console.error('Failed to delete article in Supabase:', error.message);
         return false;
       }
+      invalidatePublishedArticlesCache();
       return true;
     } catch (err) {
       console.error('Exception deleting article in Supabase:', err);
@@ -531,12 +619,14 @@ export const articlesService = {
 
     if (isSupabaseConfigured() && client) {
       try {
+        realtimeSubscriptionCounter += 1;
         supabaseChannel = client
-          .channel('public:articles')
+          .channel(`public:articles:${realtimeSubscriptionCounter}`)
           .on(
             'postgres_changes',
             { event: '*', schema: 'public', table: 'articles' },
             async () => {
+              invalidatePublishedArticlesCache();
               const fresh = await this.getAllArticlesForAdmin();
               callback(fresh);
             }
@@ -544,6 +634,41 @@ export const articlesService = {
           .subscribe();
       } catch (err) {
         console.warn('Realtime articles subscription unavailable:', err);
+      }
+    }
+
+    return () => {
+      if (supabaseChannel && client) {
+        client.removeChannel(supabaseChannel);
+      }
+    };
+  },
+
+  /**
+   * Public-safe real-time subscription that emits only published, publicly visible
+   * articles sorted newest-first by publication date.
+   */
+  subscribeToPublishedArticlesChanges(callback: (articles: ArticleItem[]) => void): () => void {
+    let supabaseChannel: ReturnType<NonNullable<ReturnType<typeof getSupabaseClient>>['channel']> | null = null;
+    const client = getSupabaseClient();
+
+    if (isSupabaseConfigured() && client) {
+      try {
+        realtimeSubscriptionCounter += 1;
+        supabaseChannel = client
+          .channel(`public:published-articles:${realtimeSubscriptionCounter}`)
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'articles' },
+            async () => {
+              invalidatePublishedArticlesCache();
+              const { articles } = await fetchPublishedArticlesInternal(true);
+              callback(articles);
+            }
+          )
+          .subscribe();
+      } catch (err) {
+        console.warn('Realtime published articles subscription unavailable:', err);
       }
     }
 

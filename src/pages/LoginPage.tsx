@@ -167,6 +167,10 @@ export const LoginPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="username@example.com"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  autoComplete="email"
+                  spellCheck={false}
                   className="w-full bg-[#FFFDF7] text-[#381E0A] placeholder-[#8C6B4E] text-sm font-bold pl-9 pr-3 py-2 rounded-xl border-2 border-[#542E10] focus:outline-none focus:ring-2 focus:ring-[#2F8FE0]"
                   required
                 />
@@ -184,6 +188,7 @@ export const LoginPage: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   className="w-full bg-[#FFFDF7] text-[#381E0A] placeholder-[#8C6B4E] text-sm font-bold pl-9 pr-3 py-2 rounded-xl border-2 border-[#542E10] focus:outline-none focus:ring-2 focus:ring-[#2F8FE0]"
                   required
                 />

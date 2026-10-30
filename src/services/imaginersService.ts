@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { getSupabaseClient, isSupabaseConfigured } from './supabase';
+import { getSupabaseClient, getSupabaseProjectHost, isSupabaseConfigured } from './supabase';
+import { authService } from './authService';
 import { 
   ImaginersPageData, 
   ImaginersMember, 
@@ -70,6 +71,16 @@ export const imaginersService = {
       };
     }
 
+    const sessionCheck = await authService.ensureAuthenticatedSession('the_imaginers_page.updatePageData');
+    if (!sessionCheck.ok) {
+      return {
+        success: false,
+        error: sessionCheck.error || 'Authentication required. Please log in again.',
+      };
+    }
+
+    const projectHost = getSupabaseProjectHost();
+
     try {
       const payload = {
         id: 'main',
@@ -78,30 +89,125 @@ export const imaginersService = {
         updated_at: new Date().toISOString(),
       };
 
-      const { data, error } = await client
+      // 1. Update existing singleton row 'main' first so existing-row saves only require UPDATE policy
+      const { data: updatedRow, error: updateError } = await client
         .from('the_imaginers_page')
-        .upsert(payload)
-        .select('title, description, updated_at')
+        .update({
+          title: payload.title,
+          description: payload.description,
+          updated_at: payload.updated_at,
+        })
+        .eq('id', 'main')
+        .select('id, title, description, updated_at')
         .maybeSingle();
 
-      if (error) {
-        console.error('Failed to update the_imaginers_page in Supabase:', error.message);
+      if (updateError) {
+        console.error('[SupabaseDiag:WriteError]', {
+          table: 'the_imaginers_page',
+          operation: 'update',
+          projectHost,
+          authRole: sessionCheck.authRole,
+          userId: sessionCheck.user?.id ?? null,
+          userEmail: sessionCheck.user?.email ?? null,
+          code: updateError.code ?? null,
+          message: updateError.message,
+          details: updateError.details ?? null,
+          hint: updateError.hint ?? null,
+        });
         return {
           success: false,
-          error: `Database save failed: ${error.message}. Ensure you have run supabase_imaginers_setup.sql in Supabase SQL editor.`,
+          error: `Database save failed: ${updateError.message}`,
         };
       }
+
+      if (updatedRow) {
+        console.info('[SupabaseDiag:WriteSuccess]', {
+          table: 'the_imaginers_page',
+          operation: 'update',
+          projectHost,
+          userId: sessionCheck.user?.id ?? null,
+          userEmail: sessionCheck.user?.email ?? null,
+        });
+        return {
+          success: true,
+          data: {
+            title: updatedRow.title ?? payload.title,
+            description: updatedRow.description ?? payload.description,
+            updated_at: updatedRow.updated_at || payload.updated_at,
+          },
+        };
+      }
+
+      // 2. If 0 rows were updated, check whether 'main' row exists yet
+      const { data: existingRow, error: checkError } = await client
+        .from('the_imaginers_page')
+        .select('id')
+        .eq('id', 'main')
+        .maybeSingle();
+
+      if (!checkError && existingRow) {
+        // Row exists, meaning UPDATE matched 0 rows due to RLS USING condition rejecting this user
+        console.error('[SupabaseDiag:WriteError]', {
+          table: 'the_imaginers_page',
+          operation: 'update_rejected_by_rls_using',
+          projectHost,
+          authRole: sessionCheck.authRole,
+          userId: sessionCheck.user?.id ?? null,
+          userEmail: sessionCheck.user?.email ?? null,
+        });
+        return {
+          success: false,
+          error: `Database save failed: Akun "${sessionCheck.user?.email || 'saat ini'}" tidak memiliki izin tulis (RLS policy) pada tabel the_imaginers_page.`,
+        };
+      }
+
+      // 3. Singleton row 'main' does not exist yet: insert initial row
+      const { data: insertedRow, error: insertError } = await client
+        .from('the_imaginers_page')
+        .insert(payload)
+        .select('title, description, updated_at')
+        .single();
+
+      if (insertError) {
+        console.error('[SupabaseDiag:WriteError]', {
+          table: 'the_imaginers_page',
+          operation: 'insert',
+          projectHost,
+          authRole: sessionCheck.authRole,
+          userId: sessionCheck.user?.id ?? null,
+          userEmail: sessionCheck.user?.email ?? null,
+          code: insertError.code ?? null,
+          message: insertError.message,
+          details: insertError.details ?? null,
+          hint: insertError.hint ?? null,
+        });
+        return {
+          success: false,
+          error: `Database save failed: ${insertError.message}`,
+        };
+      }
+
+      console.info('[SupabaseDiag:WriteSuccess]', {
+        table: 'the_imaginers_page',
+        operation: 'insert',
+        projectHost,
+        userId: sessionCheck.user?.id ?? null,
+        userEmail: sessionCheck.user?.email ?? null,
+      });
 
       return {
         success: true,
         data: {
-          title: data?.title ?? (payload.title as string) ?? '',
-          description: data?.description ?? (payload.description as string) ?? '',
-          updated_at: data?.updated_at || (payload.updated_at as string) || new Date().toISOString(),
+          title: insertedRow?.title ?? payload.title,
+          description: insertedRow?.description ?? payload.description,
+          updated_at: insertedRow?.updated_at || payload.updated_at,
         },
       };
     } catch (err) {
-      console.error('Exception updating the_imaginers_page:', err);
+      console.error('[SupabaseDiag:WriteException] Exception updating the_imaginers_page:', {
+        projectHost,
+        message: err instanceof Error ? err.message : String(err),
+      });
       return {
         success: false,
         error: err instanceof Error ? err.message : 'Unknown error while saving page information.',
@@ -189,6 +295,14 @@ export const imaginersService = {
       };
     }
 
+    const sessionCheck = await authService.ensureAuthenticatedSession('the_imaginers.uploadMemberPhoto');
+    if (!sessionCheck.ok) {
+      return {
+        success: false,
+        error: sessionCheck.error || 'Authentication required to upload member photo.',
+      };
+    }
+
     const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const cleanFileName = `member_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
     const storagePath = `members/${cleanFileName}`;
@@ -271,6 +385,14 @@ export const imaginersService = {
       return {
         success: false,
         error: 'Supabase client is not configured.',
+      };
+    }
+
+    const sessionCheck = await authService.ensureAuthenticatedSession('the_imaginers_members.createMember');
+    if (!sessionCheck.ok) {
+      return {
+        success: false,
+        error: sessionCheck.error || 'Authentication required to add a member.',
       };
     }
 
@@ -361,8 +483,16 @@ export const imaginersService = {
       };
     }
 
+    const sessionCheck = await authService.ensureAuthenticatedSession('the_imaginers_members.updateMember');
+    if (!sessionCheck.ok) {
+      return {
+        success: false,
+        error: sessionCheck.error || 'Authentication required to update member.',
+      };
+    }
+
     try {
-      const updatePayload: Record<string, any> = {
+      const updatePayload: Record<string, unknown> = {
         updated_at: new Date().toISOString(),
       };
 
@@ -387,25 +517,36 @@ export const imaginersService = {
         .select('*');
 
       if (error) {
-        console.error('Failed to update member in Supabase:', error.message);
+        console.error('[SupabaseDiag:WriteError]', {
+          table: 'the_imaginers_members',
+          operation: 'update',
+          projectHost: getSupabaseProjectHost(),
+          authRole: sessionCheck.authRole,
+          userId: sessionCheck.user?.id ?? null,
+          code: error.code ?? null,
+          message: error.message,
+        });
         return {
           success: false,
           error: `Failed to update member: ${error.message}`,
         };
       }
 
-      let updated = updatedRows && updatedRows.length > 0 ? updatedRows[0] : null;
+      const updated = updatedRows && updatedRows.length > 0 ? updatedRows[0] : null;
 
       if (!updated) {
-        const { data: fetchRows } = await client
-          .from('the_imaginers_members')
-          .select('*')
-          .eq('id', id)
-          .limit(1);
-
-        if (fetchRows && fetchRows.length > 0) {
-          updated = fetchRows[0];
-        }
+        console.error('[SupabaseDiag:WriteError]', {
+          table: 'the_imaginers_members',
+          operation: 'update_zero_rows',
+          projectHost: getSupabaseProjectHost(),
+          authRole: sessionCheck.authRole,
+          userId: sessionCheck.user?.id ?? null,
+          memberId: id,
+        });
+        return {
+          success: false,
+          error: 'Failed to update member: Row not found or write blocked by row-level security policy.',
+        };
       }
 
       const finalPhoto = updated?.photo_url || updated?.picture_url || (data.photo_url as string) || '';
@@ -445,6 +586,14 @@ export const imaginersService = {
       return {
         success: false,
         error: 'Supabase client is not configured.',
+      };
+    }
+
+    const sessionCheck = await authService.ensureAuthenticatedSession('the_imaginers_members.deleteMember');
+    if (!sessionCheck.ok) {
+      return {
+        success: false,
+        error: sessionCheck.error || 'Authentication required to delete member.',
       };
     }
 
@@ -495,6 +644,14 @@ export const imaginersService = {
       return {
         success: false,
         error: 'Supabase client is not configured.',
+      };
+    }
+
+    const sessionCheck = await authService.ensureAuthenticatedSession('the_imaginers_members.reorderMembers');
+    if (!sessionCheck.ok) {
+      return {
+        success: false,
+        error: sessionCheck.error || 'Authentication required to reorder members.',
       };
     }
 

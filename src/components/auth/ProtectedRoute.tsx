@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { authService } from '../../services/authService';
+import { isSupabaseConfigured } from '../../services/supabase';
 import { LoadingState } from '../common/LoadingState';
 
 export interface ProtectedRouteProps {
@@ -19,11 +20,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   useEffect(() => {
     let isMounted = true;
 
-    // Check synchronous cache first for instant render if already present
-    if (authService.isAuthenticated()) {
+    // When Supabase is configured, always verify and initialize the real Supabase JWT session
+    // before rendering admin screens to avoid stale localStorage cache or uninitialized token races.
+    if (!isSupabaseConfigured() && authService.isAuthenticated()) {
       setIsAuthenticated(true);
     } else {
-      // Check asynchronous Supabase session (handles OAuth redirect & page refresh)
       authService.getSession().then((user) => {
         if (isMounted) {
           setIsAuthenticated(Boolean(user));
