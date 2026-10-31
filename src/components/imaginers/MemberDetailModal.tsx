@@ -207,14 +207,14 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
       onClick={onClose}
       aria-hidden="false"
     >
-      {/* Landscape Modal Container: 16:9 ratio on desktop, responsive landscape on mobile */}
+      {/* Content-driven responsive modal container: 3:4 portrait photo reference on mobile, 16:9 landscape on desktop */}
       <div
         ref={modalContainerRef}
         role="dialog"
         aria-modal="true"
         aria-label={`Profile: ${member.name}`}
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-[900px] min-h-[300px] sm:min-h-[380px] md:aspect-[16/9] bg-[#FFFDF7] border-[4px] sm:border-[5px] border-[#452106] rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.7),0_6px_0_#2B1302] overflow-hidden flex flex-row items-stretch select-text animate-in fade-in zoom-in-95 duration-300 ease-out"
+        className="relative w-full max-w-[900px] h-auto max-h-[85vh] sm:max-h-[90vh] md:aspect-[16/9] md:min-h-[360px] md:max-h-[520px] bg-[#FFFDF7] border-[4px] sm:border-[5px] border-[#452106] rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.7),0_6px_0_#2B1302] overflow-hidden flex flex-row items-stretch select-text animate-in fade-in zoom-in-95 duration-300 ease-out"
       >
         {/* Close (X) Button positioned at the top right of the modal */}
         <button
@@ -226,13 +226,13 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
           }}
           aria-label="Tutup modal profil"
           title="Tutup (Esc)"
-          className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 z-30 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#522C10]/85 hover:bg-[#3D1E08] text-[#FAF0D4] hover:text-white border-2 border-[#FAF0D4]/40 hover:border-[#FAF0D4] flex items-center justify-center cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#FFD54F]"
+          className="absolute top-2 right-2 sm:top-3.5 sm:right-3.5 z-30 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[#522C10]/85 hover:bg-[#3D1E08] text-[#FAF0D4] hover:text-white border-2 border-[#FAF0D4]/40 hover:border-[#FAF0D4] flex items-center justify-center cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#FFD54F]"
         >
-          <X className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
+          <X className="w-3.5 h-3.5 sm:w-5 sm:h-5" strokeWidth={2.5} />
         </button>
 
-        {/* LEFT HALF: Member Photo (fills the full left half, object-cover, no distortion) */}
-        <div className="w-[42%] sm:w-1/2 h-full relative bg-[#1F1004] overflow-hidden shrink-0">
+        {/* LEFT HALF: Member Photo (3:4 portrait aspect ratio on mobile, full-height landscape on desktop) */}
+        <div className="w-[42%] sm:w-1/2 aspect-[3/4] md:aspect-auto md:h-full relative bg-[#1F1004] overflow-hidden shrink-0">
           {photoUrl ? (
             <img
               src={photoUrl}
@@ -241,8 +241,8 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
               loading="eager"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center text-[#D6BC90] bg-[#3B1F08] p-4 text-center">
-              <span className="font-display text-sm sm:text-base">Foto Profil</span>
+            <div className="w-full h-full flex flex-col items-center justify-center text-[#D6BC90] bg-[#3B1F08] p-3 text-center">
+              <span className="font-display text-xs sm:text-base">Foto Profil</span>
             </div>
           )}
 
@@ -250,20 +250,20 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
           <div className="absolute inset-y-0 right-0 w-[2px] bg-[#452106]/50 pointer-events-none" />
         </div>
 
-        {/* RIGHT HALF: Text Content (vertically centered with comfortable padding) */}
+        {/* RIGHT HALF: Text Content (top-aligned to photo on mobile, centered on desktop) */}
         <div 
           onClick={handleSkipTyping}
-          className="w-[58%] sm:w-1/2 h-full flex flex-col justify-center p-3.5 sm:p-6 md:p-8 lg:p-10 bg-[#FFFDF7] relative overflow-y-auto cursor-pointer"
+          className="w-[58%] sm:w-1/2 h-auto flex flex-col justify-start md:justify-center p-3 sm:p-5 md:p-8 lg:p-10 pr-8 sm:pr-10 md:pr-8 lg:pr-10 bg-[#FFFDF7] relative overflow-y-auto cursor-pointer"
           title="Klik teks untuk mempercepat pengetikan"
         >
           {/* Subtle Sector Header Badge */}
-          <div className="flex items-center gap-1.5 text-[9px] sm:text-xs font-display uppercase tracking-widest text-[#8C5D35] mb-2 sm:mb-4 select-none">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E8863A]" />
-            <span>The Imaginers Guild</span>
+          <div className="flex items-center gap-1 text-[9px] sm:text-xs font-display uppercase tracking-widest text-[#8C5D35] mb-1.5 sm:mb-3 select-none">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E8863A] shrink-0" />
+            <span className="truncate">The Imaginers Guild</span>
           </div>
 
           {/* Profile Fields in Exact Order: Nama, NIM, Role, Instagram */}
-          <div className="space-y-2 sm:space-y-3.5 md:space-y-4 font-sans text-xs sm:text-sm md:text-base lg:text-lg">
+          <div className="space-y-1.5 sm:space-y-3 md:space-y-4 font-sans text-xs sm:text-sm md:text-base lg:text-lg">
             {fields.map((field, fieldIndex) => {
               // Calculate how many characters are rendered for this field
               let renderedCharsCount = 0;
@@ -300,7 +300,7 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
                 >
                   {/* Muted Label */}
                   {visibleLabel && (
-                    <span className="font-display text-[#8C5D35] font-bold text-xs sm:text-sm md:text-base mr-1.5 sm:mr-2 shrink-0">
+                    <span className="font-display text-[#8C5D35] font-bold text-[11px] sm:text-sm md:text-base mr-1 sm:mr-2 shrink-0">
                       {visibleLabel}
                     </span>
                   )}
@@ -316,14 +316,14 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
                           e.stopPropagation();
                           soundManager.playClick();
                         }}
-                        className="font-sans font-extrabold text-[#146FBF] hover:text-[#093764] hover:underline transition-colors duration-200 inline-flex items-center gap-1 break-all"
+                        className="font-sans font-extrabold text-[#146FBF] hover:text-[#093764] hover:underline transition-colors duration-200 inline-flex items-center gap-1 text-[11px] sm:text-sm md:text-base break-all"
                         title={`Buka Instagram ${visibleValue}`}
                       >
                         <span>{visibleValue}</span>
                         <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline-block shrink-0 opacity-80" />
                       </a>
                     ) : (
-                      <span className="font-sans font-extrabold text-[#2A1202] break-words">
+                      <span className="font-sans font-extrabold text-[#2A1202] text-[11px] sm:text-sm md:text-base break-words">
                         {visibleValue}
                       </span>
                     )
